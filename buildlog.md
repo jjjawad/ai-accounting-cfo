@@ -293,3 +293,25 @@ pm run build.
   - Optional smoke test: temporary import from types/ resolved correctly and then removed.
 - Notes:
   - These placeholder files will be expanded during Step 8 (Database Schema) and later backend API steps.
+### STEP 2.6 — Align Frontend & Backend Imports with New Structure — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - frontend/app/dashboard/page.tsx (temporary smoke-test imports added and removed)
+  - backend/server/api/dashboard/index.ts (temporary smoke-test import added and removed)
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified successful TypeScript compilation in both frontend and backend using 
+pm run build and 
+pm run lint.
+  - Temporary imports confirmed correct path resolution for:
+      - frontend/lib/*
+      - types/domain.ts
+      - types/api.ts
+- Notes:
+  - Temporary imports were removed after validation.
+  - Project structure is fully aligned for upcoming Step 2.7 (human review).
