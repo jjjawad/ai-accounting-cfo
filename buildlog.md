@@ -230,3 +230,26 @@ pm run dev.
   - Verified that /admin loads successfully and displays placeholder "Admin Home".
 - Notes:
   - This is the base admin entry route; detailed admin screens will be added in future steps.
+### STEP 2.3 — Create Frontend /lib Domain Folders — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - frontend/lib/ai/index.ts
+  - frontend/lib/ocr/index.ts
+  - frontend/lib/pipeline/index.ts
+  - frontend/lib/vat/index.ts
+  - frontend/lib/accounting/index.ts
+  - frontend/lib/supabase/index.ts
+  - frontend/lib/utils/index.ts
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified 
+pm run lint and 
+pm run build compile successfully.
+  - Optional smoke test import resolved correctly.
+- Notes:
+  - These folders form the long-term domain structure for AI, OCR, VAT, pipeline, and accounting logic.
