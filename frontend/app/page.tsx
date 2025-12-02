@@ -1,5 +1,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
@@ -7,6 +8,9 @@ export default function Home() {
       <main className={styles.main}>
         <div className="text-2xl font-bold text-blue-600">
           Tailwind is working!
+        </div>
+        <div className="p-4">
+          <Button>Test Button</Button>
         </div>
         <Image
           className={styles.logo}
