@@ -177,3 +177,21 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
 - Notes:
   - Real keys must be added manually by developer.
   - Backend and frontend will be fully wired to Supabase/Auth/AI in subsequent steps.
+### STEP 1.11 — Connect GitHub Repository to Vercel and Configure Environment — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - vercel/
+  - vercel/README.md
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - Vercel project created and linked to GitHub repository.
+  - Environment variables added in Vercel dashboard for frontend + backend.
+  - Automatic deployment enabled on main branch.
+- Testing result:
+  - Verified successful Vercel deployment of the Next.js frontend.
+  - Confirmed env vars load correctly in Vercel environment.
+- Notes:
+  - Step 1 is now fully completed. The project is ready for Step 2 — Folder & File Structure.
