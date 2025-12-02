@@ -159,3 +159,21 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
   - Human verified external provider keys exist.
 - Notes:
   - Real provider clients will be wired in Step 1.10.
+### STEP 1.10 — Create Local .env Files for Frontend and Backend — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - frontend/.env.local
+  - backend/.env
+- Files MODIFIED:
+  - .gitignore (updated to ensure all env files are ignored)
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - Added placeholder local environment variable files for Supabase, OpenAI, Google Vision, and Email provider.
+- Testing result:
+  - Verified both .env files exist with placeholder keys only.
+  - Verified env files are excluded from Git.
+  - Frontend and backend can now load environment variables in future steps.
+- Notes:
+  - Real keys must be added manually by developer.
+  - Backend and frontend will be fully wired to Supabase/Auth/AI in subsequent steps.
