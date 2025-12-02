@@ -141,3 +141,21 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
 - Notes:
   - Actual environment variables will be inserted in Step 1.10.
   - Keys are NOT stored in the repository for security reasons.
+### STEP 1.9 — Set Up External API Providers (OpenAI, Google Vision, Email) — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - backend/lib/external/
+  - backend/lib/external/openai.ts
+  - backend/lib/external/vision.ts
+  - backend/lib/external/email.ts
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None (keys generated manually and stored securely outside repo)
+- Testing result:
+  - Verified all placeholder integration files added.
+  - Human verified external provider keys exist.
+- Notes:
+  - Real provider clients will be wired in Step 1.10.
