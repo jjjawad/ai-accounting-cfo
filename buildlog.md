@@ -195,3 +195,24 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
   - Confirmed env vars load correctly in Vercel environment.
 - Notes:
   - Step 1 is now fully completed. The project is ready for Step 2 — Folder & File Structure.
+### STEP 2.1 — Create Core Client-Facing App Routes — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - frontend/app/dashboard/page.tsx
+  - frontend/app/transactions/page.tsx
+  - frontend/app/documents/page.tsx
+  - frontend/app/vat/page.tsx
+  - frontend/app/cashflow/page.tsx
+  - frontend/app/chat/page.tsx
+  - frontend/app/settings/page.tsx
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified all seven routes load and display placeholder content via 
+pm run dev.
+- Notes:
+  - These pages are placeholders only; full UI is implemented in Step 4.
