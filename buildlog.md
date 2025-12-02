@@ -124,3 +124,20 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
   - Placeholder backend files created successfully.
 - Notes:
   - Real Supabase client integration will occur after environment variables are added in Step 1.10.
+### STEP 1.8 — Retrieve Supabase Keys and Project URL — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - env.example
+  - backend/env.example
+  - .gitignore (created)
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None (keys retrieved manually and stored securely outside repository)
+- Testing result:
+  - Verified placeholder env templates created and gitignored properly.
+- Notes:
+  - Actual environment variables will be inserted in Step 1.10.
+  - Keys are NOT stored in the repository for security reasons.
