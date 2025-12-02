@@ -107,3 +107,20 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
 - Notes:
   - Environment variables will be added in Step 1.10.
   - No Supabase schema or tables created yet.
+### STEP 1.7 — Configure Supabase Auth & Storage Defaults — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - backend/lib/supabase-client.ts
+  - backend/lib/storage.ts
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - Supabase dashboard: Enabled email/password auth
+  - Supabase dashboard: Created private 'documents' storage bucket
+- Testing result:
+  - Verified Supabase Auth and Storage configuration works in dashboard.
+  - Placeholder backend files created successfully.
+- Notes:
+  - Real Supabase client integration will occur after environment variables are added in Step 1.10.
