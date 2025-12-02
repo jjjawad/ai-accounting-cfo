@@ -315,3 +315,25 @@ pm run lint.
 - Notes:
   - Temporary imports were removed after validation.
   - Project structure is fully aligned for upcoming Step 2.7 (human review).
+### STEP 2.7 — Human Review & Approval of Folder / Route Structure — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - buildlog.md (added human-approval note)
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Completed manual inspection of:
+      - frontend/app/*
+      - frontend/lib/*
+      - backend/server/api/*
+      - types/*
+  - All structures match the Master Document functional areas:
+      Dashboard, Transactions, Documents, VAT, Cashflow,
+      Chat CFO, Settings, Admin, Migration.
+  - No structural issues found; no renames required.
+- Notes:
+  - Step 2 is fully approved and locked in as the foundation for all subsequent steps.
