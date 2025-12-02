@@ -1,3 +1,9 @@
+import { ProtectedRoute } from "@/components/protected-route";
+
 export default function Page() {
-  return <div>Settings Page</div>;
+  return (
+    <ProtectedRoute>
+      <div>Settings Page</div>
+    </ProtectedRoute>
+  );
 }

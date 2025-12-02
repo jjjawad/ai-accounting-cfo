@@ -337,3 +337,168 @@ pm run lint.
   - No structural issues found; no renames required.
 - Notes:
   - Step 2 is fully approved and locked in as the foundation for all subsequent steps.
+
+### STEP 3.1 — Create Global App Layout (Shell) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - frontend/app/layout.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified `/dashboard` and `/transactions` now share a unified global layout shell with Tailwind base styles applied.
+- Notes:
+  - This layout provides the structural foundation for sidebar + header additions in later Step 3 sub-steps.
+### STEP 3.2 — Implement Sidebar Navigation Structure (Static Items Only) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/sidebar.tsx
+- Files MODIFIED:
+  - frontend/app/layout.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified sidebar displays on all routes with correct static navigation labels and layouts remain functional.
+- Notes:
+  - Sidebar contains no links or active state yet; this will be implemented in Steps 3.3 and 3.4.
+### STEP 3.3 — Wire Navigation Links to All Routes — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - frontend/components/sidebar.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Confirmed all sidebar items navigate to existing routes (`/dashboard`, `/transactions`, `/documents`, `/vat`, `/cashflow`, `/chat`, `/settings`, `/admin`). No layout regressions observed.
+- Notes:
+  - Active state highlighting will be added in Step 3.4.
+### STEP 3.4 — Add Active Navigation State Highlight — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - frontend/components/sidebar.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified active state highlights correctly using `usePathname()` and persists across refresh; deep paths (e.g., `/admin/users`) highlight parent item.
+- Notes:
+  - Sidebar navigation is now interactive and visually stateful; header creation comes next.
+### STEP 3.5 — Create Header Component (Top Bar Shell) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/header.tsx
+- Files MODIFIED:
+  - frontend/app/layout.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified header displays across all routes above page content, layout stable with sidebar + header combination.
+- Notes:
+  - Placeholder-only header; company switcher and user UI will be added in Steps 3.6+.
+### STEP 3.6 — Implement Company Switcher UI (Static, No Backend) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/company-switcher.tsx
+  - frontend/components/ui/dropdown-menu.tsx
+- Files MODIFIED:
+  - frontend/components/header.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified static company switcher dropdown appears in header and opens with placeholder options ("Company A", "Company B"). No state changes as expected.
+- Notes:
+  - UI-only implementation using local dropdown primitives compatible with shadcn Button; real selection logic follows in Step 3.7.
+### STEP 3.7 — Hook Company Switcher Into URL State (Client-Side Only) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/company-provider.tsx
+- Files MODIFIED:
+  - frontend/app/layout.tsx
+  - frontend/components/company-switcher.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified the company switcher updates using client-side context state; selection persists across navigation and resets on reload as expected.
+- Notes:
+  - Completes temporary client-side selection system; auth/state persistence to be added in later steps.
+### STEP 3.8 — Implement Protected Routes Wrapper (Auth Required) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/protected-route.tsx
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified ProtectedRoute blocks access when session is null and renders placeholder “Not logged in.”
+- Notes:
+  - Wrapper ready to be applied to pages in Step 3.9; real Supabase session wiring comes in Step 5+.
+### STEP 3.9 — Wrap All App Pages With ProtectedRoute — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - None
+- Files MODIFIED:
+  - frontend/app/dashboard/page.tsx
+  - frontend/app/transactions/page.tsx
+  - frontend/app/documents/page.tsx
+  - frontend/app/vat/page.tsx
+  - frontend/app/cashflow/page.tsx
+  - frontend/app/chat/page.tsx
+  - frontend/app/settings/page.tsx
+  - frontend/app/admin/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified that all pages now correctly display “Not logged in.” and no protected content is visible. Layout remains intact and stable.
+- Notes:
+  - Finalizes UI protection layer; real auth logic will replace placeholder in Step 5+.
+### STEP 3.10 — Add User Menu (Avatar + Dropdown) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/user-menu.tsx
+- Files MODIFIED:
+  - frontend/components/header.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified avatar renders in header; dropdown opens and shows static “Profile” and “Logout” items. Layout remains stable alongside company switcher.
+- Notes:
+  - Pure UI step. Real auth-aware menu will be implemented during Step 5 (Auth Integration).
+### STEP 3.11 — Add Layout Loading & Skeleton States — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/app/loading.tsx
+  - frontend/components/ui/skeleton.tsx
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified global skeleton UI appears during route transitions; sidebar/header/content skeletons animate correctly. No layout regressions.
+- Notes:
+  - Prepares app for async session loading and data fetching in Step 5 and beyond.

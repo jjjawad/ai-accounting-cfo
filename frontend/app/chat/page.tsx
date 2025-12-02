@@ -1,3 +1,9 @@
+import { ProtectedRoute } from "@/components/protected-route";
+
 export default function Page() {
-  return <div>Chat Page</div>;
+  return (
+    <ProtectedRoute>
+      <div>Chat Page</div>
+    </ProtectedRoute>
+  );
 }
