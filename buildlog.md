@@ -90,3 +90,20 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
   - Verified backend folder structure exists and npm install + npm run dev complete without errors.
 - Notes:
   - Backend workspace prepared. Ready for Supabase and API scaffolding in later steps.
+### STEP 1.6 — Create Supabase Project (DB + Storage + Auth Baseline) — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - supabase/
+  - supabase/README.md
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None (Supabase project created externally in dashboard)
+- Testing result:
+  - Verified Supabase project exists with DB, Auth, and Storage enabled.
+  - Repo now includes the supabase/ placeholder directory for future schema work.
+- Notes:
+  - Environment variables will be added in Step 1.10.
+  - No Supabase schema or tables created yet.
