@@ -71,3 +71,22 @@ pm run dev and verified Tailwind styles render correctly on the homepage.
   - Verified shadcn Button renders correctly at http://localhost:3000.
 - Notes:
   - shadcn UI successfully installed; project is ready for UI component scaffolding in later steps.
+### STEP 1.5 — Scaffold Backend Folder for Serverless Functions — Completed
+- Date: December 2, 2025
+- Files CREATED:
+  - backend/package.json
+  - backend/README.md
+  - backend/api/
+  - backend/lib/
+  - backend/utils/
+  - backend/package-lock.json
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified backend folder structure exists and npm install + npm run dev complete without errors.
+- Notes:
+  - Backend workspace prepared. Ready for Supabase and API scaffolding in later steps.
