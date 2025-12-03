@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Company } from "../../../types/company";
+import type { Company } from "@/types/company";
 
 async function fetchCompanies(): Promise<Company[]> {
   const res = await fetch("/api/companies");

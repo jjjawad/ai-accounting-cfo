@@ -1,6 +1,6 @@
 import { useCompany } from "@/context/company-context";
 import { useCompaniesQuery } from "@/hooks/queries/use-companies-query";
-import type { Company } from "../../types/company";
+import type { Company } from "@/types/company";
 
 export function useActiveCompany() {
   const { companyId } = useCompany();
