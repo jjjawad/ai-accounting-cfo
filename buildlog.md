@@ -398,6 +398,23 @@ pm run lint.
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/header.tsx
+### STEP 4.9 — Admin Review Queue Static Screen — Completed
+- Date: 2025-12-03
+- Files CREATED:
+  - frontend/app/admin/review/page.tsx
+  - frontend/components/admin/review/review-tabs.tsx
+  - frontend/components/admin/review/review-item.tsx
+  - frontend/components/admin/review/review-detail.tsx
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified static admin review queue displays tabs, placeholder review items, and static detail panel with disabled action buttons. No backend calls, no console errors, layout fully responsive.
+- Notes:
+  - Pure static UI; real review logic and low-confidence data integration will be implemented in Step 18.
 - Files MODIFIED:
   - frontend/app/layout.tsx
 - Dependencies ADDED:
@@ -502,3 +519,413 @@ pm run lint.
   - Verified global skeleton UI appears during route transitions; sidebar/header/content skeletons animate correctly. No layout regressions.
 - Notes:
   - Prepares app for async session loading and data fetching in Step 5 and beyond.
+
+### STEP 4.1 — Dashboard Static Layout (Overview Screen) — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/dashboard/summary-card.tsx
+  - frontend/components/dashboard/chart-placeholder.tsx
+- Files MODIFIED:
+  - frontend/app/dashboard/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified all summary cards, chart placeholders, category breakdown, and insights panels render statically with no API calls. No console errors. Layout responsive across viewports.
+- Notes:
+  - This is a pure static layout implementation; no backend integration or real data. Prepares the dashboard for Step 6 mock data wiring and Step 16 backend aggregation.
+
+### STEP 4.2 — Transactions Screen Static Table Skeleton — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/transactions/table.tsx (if created)
+- Files MODIFIED:
+  - frontend/app/transactions/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified filters bar, disabled action button, and static table skeleton render correctly with no backend calls. No console errors. Layout responsive across viewport sizes.
+- Notes:
+  - Static-only implementation. No state or data binding. Prepares Transactions page for Step 6 mock data and Step 11 real transaction ingestion.
+
+### STEP 4.3 — Documents Screen Layout with Drag-and-Drop Area — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/documents/upload-zone.tsx
+  - frontend/components/documents/documents-table.tsx
+- Files MODIFIED:
+  - frontend/app/documents/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified drag-and-drop upload zone renders with hover state and opens file picker without processing files. Placeholder documents table appears correctly. No backend calls or console errors. Layout responsive across viewports.
+- Notes:
+  - Pure UI-only implementation; no real upload logic. Prepares for Step 9 (real upload pipeline) and Step 10 (OCR processing).
+
+### STEP 4.4 — VAT Screen Static Layout — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/vat/vat-summary-card.tsx
+  - frontend/components/vat/vat-breakdown-table.tsx
+- Files MODIFIED:
+  - frontend/app/vat/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - VAT screen displays static period selector, summary cards, VAT breakdown table, and disabled export button. No backend calls. No console errors. Layout responsive across viewports.
+- Notes:
+  - Pure static UI. Prepares the VAT screen for later backend integration in Steps 14 and 16.
+
+### STEP 4.5 — Cashflow / CFO Screen Static Forecast UI — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/cashflow/forecast-chart-placeholder.tsx
+  - frontend/components/cashflow/pdc-table.tsx
+  - frontend/components/cashflow/summary-card.tsx
+- Files MODIFIED:
+  - frontend/app/cashflow/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified cashflow forecast UI displays static chart placeholder, burn rate/runway cards, upcoming PDC section, and key driver notes. No backend calls. No console errors. Layout is responsive across screen sizes.
+- Notes:
+  - Static UI only. Prepares screen for Step 15 (forecast logic) and Step 16 (dashboard data aggregation).
+
+### STEP 4.6 — Chat CFO Static Interface — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/chat/message-bubble.tsx
+  - frontend/components/chat/suggestion-chips.tsx
+  - frontend/components/chat/chat-container.tsx
+- Files MODIFIED:
+  - frontend/app/chat/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified chat interface displays static user/assistant messages, suggestion chips, and disabled input send bar. No backend calls. UI scrolls correctly and is responsive.
+- Notes:
+  - Pure static UI; prepares page for Step 17 (real Chat CFO backend).
+
+### STEP 4.7 — Settings Screen Static Forms — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/settings/section-card.tsx
+  - frontend/components/settings/company-info-form.tsx
+  - frontend/components/settings/accounting-settings-form.tsx
+  - frontend/components/settings/invitations-form.tsx
+- Files MODIFIED:
+  - frontend/app/settings/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified static Company Info, Accounting Settings, and Invitations sections render with editable inputs and disabled buttons. No backend calls. No console errors. Responsive at all viewport sizes.
+- Notes:
+  - Pure UI-only implementation. Backend wiring will occur in Steps 5, 7, and 25.
+
+### STEP 4.8 — Admin Companies List Static Screen — Completed
+- Date: December 3, 2025
+- Files CREATED:
+  - frontend/components/admin/companies-table.tsx
+- Files MODIFIED:
+  - frontend/app/admin/page.tsx
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified admin companies list displays static header, card, and placeholder table rows. No backend calls. No console errors. Layout matches admin UI style and is responsive.
+- Notes:
+  - Static UI only. Backend-driven admin dashboard will be implemented in Step 18.
+### STEP 4.9 — Admin Review Queue Static Screen — Completed
+- Date: <fill in today’s date>
+- Files CREATED:
+  - frontend/app/admin/review/page.tsx
+  - frontend/components/admin/review/review-tabs.tsx
+  - frontend/components/admin/review/review-item.tsx
+  - frontend/components/admin/review/review-detail.tsx
+- Files MODIFIED:
+  - None
+- Dependencies ADDED:
+  - None
+- Config changes:
+  - None
+- Testing result:
+  - Verified static admin review queue displays tabs, placeholder review items, and static detail panel with disabled action buttons. No backend calls, no console errors, layout fully responsive.
+- Notes:
+  - Pure static UI; real review logic and low-confidence data integration will be implemented in Step 18.
+
+
+### STEP 5.1 — Install React Query & Create QueryClient Provider — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * frontend/components/query-client-provider.tsx
+* Files MODIFIED:
+
+  * frontend/package.json
+  * frontend/app/layout.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * @tanstack/react-query
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run dev` in `frontend/` and verified the app compiles successfully. Confirmed all main routes load with existing layouts intact and no new console errors after wrapping the app in the React Query provider.
+* Notes:
+
+  * React Query global provider infrastructure is now in place with `AppQueryClientProvider` wrapping the entire app in `layout.tsx`. No actual queries or DevTools have been added yet; these will be implemented in later Step 5 sub-steps.
+
+
+### STEP 5.2 — Add React Query DevTools (Optional but recommended) — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/package.json
+  * frontend/components/query-client-provider.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * @tanstack/react-query-devtools
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Dev server ran successfully. DevTools appeared in development mode, displayed an empty query list, and produced no errors. Verified the DevTools do not appear in production mode.
+* Notes:
+
+  * DevTools fully integrated and safe for future query debugging.
+
+
+### STEP 5.3 — Create CompanyContext for Active Company State — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * frontend/context/company-context.tsx
+* Files MODIFIED:
+
+  * frontend/app/layout.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Verified the app compiles and runs without errors, CompanyProvider wraps the full layout, and companyId state initializes to null.
+* Notes:
+
+  * Global company state is now established; UI wiring and server integration will occur in subsequent sub-steps.
+
+
+### STEP 5.4 — Connect Company Switcher UI to CompanyContext — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/components/company-switcher.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Company dropdown correctly reads & updates companyId using CompanyContext. UI updates instantly on selection. No errors during navigation or reload.
+* Notes:
+
+  * Temporary mock list used. Backend data integration will occur in Step 5.5+.
+
+
+### STEP 5.5 — Implement Base `/companies` API Route (Mock Data) — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * backend/app/api/companies/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Verified that `GET /api/companies` returns the mock company list without errors.
+* Notes:
+
+  * Endpoint currently returns static mock data; authentication + DB queries will be implemented in future sub-steps.
+
+
+### STEP 5.6 — Implement `useCompaniesQuery` Hook (React Query) — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * frontend/hooks/queries/use-companies-query.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Confirmed the hook fetches mock company data from `/api/companies`; React Query DevTools shows the `["companies"]` query populated without errors.
+* Notes:
+
+  * Hook ready for integration in Step 5.7.
+
+
+### STEP 5.7 — Connect Company Switcher UI to `useCompaniesQuery` — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/components/company-switcher.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Company Switcher now loads real data from `/api/companies` using React Query. Loading/error states visible. Selection correctly updates CompanyContext. No UI regressions.
+* Notes:
+
+  * UI now reflects live server data; next steps will introduce authenticated + dynamic + persistent company selection.
+
+
+### STEP 5.8 — Persist Selected Company in Local Storage — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/context/company-context.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Verified the selected company persists across page reloads via localStorage. No errors or hydration issues encountered.
+* Notes:
+
+  * Persistence is client-side only. Server-side persistence will be implemented in later steps.
+
+
+### STEP 5.9 — Auto-Select First Company on Initial Load — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/context/company-context.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Verified that when no company is stored, the first company returned by `/api/companies` is auto-selected and persisted. Refreshing retains the selected company. No errors encountered.
+* Notes:
+
+  * This behavior ensures smooth onboarding flow before backend-aware company linking is implemented in later steps.
+
+
+### STEP 5.10 — Create `useActiveCompany` Hook — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * frontend/hooks/use-active-company.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Verified the hook correctly merges companyId from context with the company list from the query, returning the active company object and loading/error states.
+* Notes:
+
+  * This hook becomes the single source of truth for components needing full active-company data rather than just the ID.
+
+
+### STEP 5.11 — Add Server Companies Schema & Response Validation (Zod) — Completed
+
+* Date: 2025-12-03
+* Files CREATED:
+
+  * backend/lib/validation/company-schema.ts
+* Files MODIFIED:
+
+  * backend/app/api/companies/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None (Zod already part of project setup from earlier steps)
+* Config changes:
+
+  * None
+* Testing result:
+
+  * `/api/companies` now validates response using Zod and returns 500 on invalid data. Verified endpoint works with correct mock data.
+* Notes:
+
+  * Backend is now schema-aware; future DB integration will rely on this schema.
