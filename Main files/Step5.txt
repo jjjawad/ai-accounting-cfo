@@ -1,0 +1,323 @@
+Below are the **atomic Sub-Steps for Step 5 — State Management Setup**, following your exact format and fully aligned with the Master Document  and Steps Document .
+
+---
+
+# **Step 5 — State Management Setup (Sub-Steps)**
+
+---
+
+## **Step 5.1 — Install React Query & Create QueryClient Provider**
+
+**Description:**
+
+* Install `@tanstack/react-query` and wrap the entire app in a `QueryClientProvider` as required in the Steps Document.
+* This establishes the global caching and data-fetching layer for all future screens.
+
+**Expected Output:**
+
+* QueryClient initialized.
+* Provider wrapped around `layout.tsx`.
+* No real queries yet, just the infrastructure.
+
+**Testing Instructions:**
+
+* Run the app; verify no errors.
+* Add a temporary dummy query in a component to confirm the provider works (then delete).
+
+**Dependencies:**
+
+* Step 3.11 (layout established).
+* Step 4 static screens (in place to host future queries).
+
+---
+
+## **Step 5.2 — Add React Query DevTools (Optional but recommended)**
+
+**Description:**
+
+* Add `ReactQueryDevtools` for debugging fetch and cache behavior during development.
+
+**Expected Output:**
+
+* DevTools visible only in development.
+* Toggle panel opens and shows empty query list.
+
+**Testing Instructions:**
+
+* Inspect DevTools panel, ensure it loads without errors.
+
+**Dependencies:**
+
+* Step 5.1 (provider must be already set).
+
+---
+
+## **Step 5.3 — Create `CompanyContext` (Global Selected Company State)**
+
+**Description:**
+
+* Create a dedicated React Context to store the selected company ID globally.
+* Replace the temporary Step 3.7 client-only mock implementation.
+
+**Expected Output:**
+
+* New `CompanyContext` with:
+  `{ companyId, setCompanyId }`
+* Provider injected in `layout.tsx`.
+
+**Testing Instructions:**
+
+* Select a company in the UI (still mock data).
+* Navigate between pages—company ID should persist.
+* On reload, it should **not** persist yet (persistence comes later).
+
+**Dependencies:**
+
+* Step 3.7 (static company switcher UI exists).
+* Step 5.1 (global provider pattern established).
+
+---
+
+## **Step 5.4 — Implement Local Persistence for Company Selection (Storage)**
+
+**Description:**
+
+* Store selected company ID in `localStorage`.
+* Restore company ID on app boot.
+
+**Expected Output:**
+
+* After selecting a company, reload → company remains selected.
+
+**Testing Instructions:**
+
+* Select “Company A”.
+* Reload page.
+* Verify switcher shows “Company A”.
+
+**Dependencies:**
+
+* Step 5.3.
+
+---
+
+## **Step 5.5 — Wire Company Switcher UI to the New CompanyContext**
+
+**Description:**
+
+* Connect dropdown selection events to `setCompanyId()` from the new context.
+* Remove any temporary client-only logic from Step 3.7.
+
+**Expected Output:**
+
+* Selecting a company updates context + persists to storage.
+
+**Testing Instructions:**
+
+* Switch companies; verify immediate UI update.
+* Reload; verify restore works.
+
+**Dependencies:**
+
+* Step 5.3 and Step 5.4.
+
+---
+
+## **Step 5.6 — Implement Supabase Session Loading (Client-Side Session State)**
+
+**Description:**
+
+* Replace fake “Not logged in” logic in ProtectedRoute.
+* Use Supabase Auth client to:
+
+  * Check current session on load.
+  * Listen for `onAuthStateChange`.
+
+**Expected Output:**
+
+* If logged in: app shows dashboards.
+* If logged out: “Not logged in”.
+
+**Testing Instructions:**
+
+* Log out manually via Supabase dashboard → app should show blocked screens.
+* Log in → app should render normally.
+
+**Dependencies:**
+
+* Step 1.7, Step 1.10 (Supabase setup + envs).
+* Step 3.8 (ProtectedRoute exists).
+
+---
+
+## **Step 5.7 — Create Lightweight `useFetch` Wrapper for React Query**
+
+**Description:**
+
+* Create a helper inside `/frontend/lib/supabase/` or `/utils/`.
+* Standardizes:
+
+  * Error handling
+  * Loading state
+  * Company scoping
+
+**Expected Output:**
+
+* A reusable hook:
+  `useApiQuery(key, fetcherFn, options?)`.
+
+**Testing Instructions:**
+
+* Use inside one static page with a mock fetcher to ensure wrapper works.
+
+**Dependencies:**
+
+* Step 5.1.
+
+---
+
+## **Step 5.8 — Add Base Fetchers for All Major Domains (No Real Backend Yet)**
+
+**Description:**
+
+* Create empty fetchers in `/frontend/lib/supabase` for:
+
+  * Dashboard
+  * Transactions
+  * Documents
+  * VAT
+  * Cashflow
+  * Chat
+  * Admin
+* They will return placeholder promises for now.
+
+**Expected Output:**
+
+* All pages have a ready-to-wire fetcher.
+
+**Testing Instructions:**
+
+* Import fetchers into a page; verify no crashes.
+
+**Dependencies:**
+
+* Step 5.7.
+
+---
+
+## **Step 5.9 — Implement Initial React Query Hooks for Key Screens (Mock Data)**
+
+**Description:**
+
+* Create hooks such as:
+
+  * `useDashboardOverview()`
+  * `useTransactions()`
+  * `useVatSummary()`
+  * etc.
+* Hooks internally call placeholder fetchers.
+* The goal is to ensure React Query wiring is correct.
+
+**Expected Output:**
+
+* Hook returns:
+
+  * `data: null`
+  * `isLoading: false`
+  * `error: null`
+
+**Testing Instructions:**
+
+* Add hook usage to Dashboard page temporarily.
+* Confirm no errors and that hook returns expected shape.
+
+**Dependencies:**
+
+* Step 5.8.
+
+---
+
+## **Step 5.10 — Connect Hooks to Real Screen Components (Non-Breaking)**
+
+**Description:**
+
+* Import the new hooks into each screen.
+* Do **not** replace static UI—just integrate the loading states.
+
+**Expected Output:**
+
+* Components begin reading `isLoading` values.
+* No UI change yet, but logs show React Query hooks firing.
+
+**Testing Instructions:**
+
+* Open dashboard in browser, watch console → React Query keys appear.
+* No UI regressions.
+
+**Dependencies:**
+
+* Step 4 static pages.
+* Step 5.9.
+
+---
+
+## **Step 5.11 — Configure Global Cache Policies (TTL, Stale Time)**
+
+**Description:**
+
+* Based on the Step Document requirement for human confirmation:
+
+  * Set default `staleTime`, `cacheTime`, `retry` strategy.
+  * Recommended:
+
+    * `staleTime: 5 * 60 * 1000` (5 minutes)
+    * `cacheTime: 60 * 60 * 1000` (1 hour)
+
+**Expected Output:**
+
+* QueryClient initialized with custom defaults.
+
+**Testing Instructions:**
+
+* Open DevTools → verify cache TTL values.
+* Refresh app → cached queries should restore instantly within TTL.
+
+**Dependencies:**
+
+* Step 5.1.
+
+---
+
+## **Step 5.12 — Finalize Step 5 by Removing All Temporary Console Logs & Dummy Calls**
+
+**Description:**
+
+* Clean up all temporary debugging logs, test hooks, test fetchers.
+* Step 5 must end with:
+
+  * A clean state system
+  * React Query active
+  * CompanyContext wired
+  * Session handling implemented
+
+**Expected Output:**
+
+* Clean console.
+* No leftover temporary code.
+
+**Testing Instructions:**
+
+* Load all pages.
+* Ensure:
+
+  * No console warnings.
+  * No dummy logs.
+  * No broken imports.
+
+**Dependencies:**
+
+* All Step 5 sub-steps.
+
+---
+
+If you want, I can now generate **Step 6 Sub-Steps**, or prepare **IDE Mission Commands** for Step 5.

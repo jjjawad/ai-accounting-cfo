@@ -1,0 +1,155 @@
+Step 2.1 — Create Core Client-Facing App Routes in `/frontend/app`
+Description:
+
+* Create the main Next.js App Router pages for all client-facing screens defined in the Steps Document: `dashboard`, `transactions`, `documents`, `vat`, `cashflow`, `chat`, and `settings`.
+* Each route should have a minimal placeholder page (e.g., a simple heading) with no real layout, navigation, or data logic yet. Actual UI layouts are handled later in Step 4.
+  Expected Output:
+* Under `frontend/app/`, the following directories and `page.tsx` files exist and compile:
+
+  * `frontend/app/dashboard/page.tsx`
+  * `frontend/app/transactions/page.tsx`
+  * `frontend/app/documents/page.tsx`
+  * `frontend/app/vat/page.tsx`
+  * `frontend/app/cashflow/page.tsx`
+  * `frontend/app/chat/page.tsx`
+  * `frontend/app/settings/page.tsx`
+* Each page renders a simple placeholder text confirming which screen it represents.
+  Testing Instructions:
+* Run `npm run dev` in `frontend/`.
+* Visit each of the routes in the browser:
+  `/dashboard`, `/transactions`, `/documents`, `/vat`, `/cashflow`, `/chat`, `/settings`.
+* Confirm each route loads without errors and shows its placeholder content.
+  Dependencies:
+* Step 1.2 — Initialize Next.js TypeScript App in frontend.
+* Step 1.3 — Add Tailwind CSS to the Next.js Frontend.
+
+---
+
+Step 2.2 — Create Admin Route Skeleton in `/frontend/app/admin`
+Description:
+
+* Create the base `admin` route to host internal-operator screens (Admin Overview, Review Queue, Logs) as described in the Master Document, but keep it as a simple placeholder for now.
+* This establishes a clear separation between client-facing routes and internal admin tools.
+  Expected Output:
+* `frontend/app/admin/page.tsx` exists and renders simple placeholder content such as “Admin Home”.
+* The route compiles and is reachable at `/admin`.
+  Testing Instructions:
+* With `npm run dev` running in `frontend/`, open `/admin` in the browser.
+* Confirm that the admin page loads with placeholder content and no runtime errors.
+  Dependencies:
+* Step 2.1 — Create Core Client-Facing App Routes in `/frontend/app`.
+* Step 1.4 — Install and Configure shadcn UI in Frontend (for later admin UI; not used yet but environment is ready).
+
+---
+
+Step 2.3 — Create Frontend `/lib` Domain Folders
+Description:
+
+* Create the domain-oriented library folders in the frontend project as specified in the Steps Document: `ai`, `ocr`, `pipeline`, `vat`, `accounting`, `supabase`, `utils`.
+* Add an empty placeholder file in each folder (e.g., `index.ts`) so imports can compile later when logic is added in backend-related steps.
+  Expected Output:
+* Under `frontend/lib/`, the following directories exist, each with at least one empty or minimal placeholder file:
+
+  * `frontend/lib/ai/`
+  * `frontend/lib/ocr/`
+  * `frontend/lib/pipeline/`
+  * `frontend/lib/vat/`
+  * `frontend/lib/accounting/`
+  * `frontend/lib/supabase/`
+  * `frontend/lib/utils/`
+* Frontend TypeScript build succeeds with these new folders present.
+  Testing Instructions:
+* Run `npm run lint` and/or `npm run build` in `frontend/` to ensure no TypeScript or build errors caused by the new folders.
+* Optionally add a temporary import from one of the pages (e.g., import from `@/lib/utils`) and ensure the project still compiles, then remove it.
+  Dependencies:
+* Step 1.2 — Initialize Next.js TypeScript App in frontend.
+
+---
+
+Step 2.4 — Create Backend `/server/api` Endpoint Folder Structure
+Description:
+
+* In the backend workspace, create a folder tree under `/server/api` (or the agreed backend root) that mirrors the main API groups defined in the Master Document and Steps Document: auth, companies, files, transactions, vat, dashboard, cashflow, chat, admin, and migration.
+* Only create placeholder files (e.g., `index.ts` or `route.ts`) for each group; real logic and handlers will be implemented later in Step 7 (Backend Scaffolding).
+  Expected Output:
+* Under the backend project (e.g., `backend/`), the following structure exists:
+
+  * `backend/server/api/auth/`
+  * `backend/server/api/companies/`
+  * `backend/server/api/files/`
+  * `backend/server/api/transactions/`
+  * `backend/server/api/vat/`
+  * `backend/server/api/dashboard/`
+  * `backend/server/api/cashflow/`
+  * `backend/server/api/chat/`
+  * `backend/server/api/admin/`
+  * `backend/server/api/migration/` (for the historical data migration engine mentioned in the Master Document).
+* Each folder contains at least one minimal placeholder file so the backend compiles.
+  Testing Instructions:
+* Run `npm install` (if needed) and `npm run build` or `npm run lint` in `backend/`.
+* Confirm the build completes without module resolution errors from the new `/server/api` structure.
+  Dependencies:
+* Step 1.5 — Scaffold Backend Folder for Serverless Functions.
+* Step 1.10 — Create Local .env Files for Frontend and Backend (ensures backend build can read env without crashing, even though they may not be used yet).
+
+---
+
+Step 2.5 — Create Shared `/types` Folder for Domain & API Interfaces
+Description:
+
+* Create a top-level `types` folder for shared TypeScript interfaces that reflect the data models and API contracts from the Master Document (User, Company, BankTransaction, File, Invoice, etc., plus key API response shapes).
+* For now, add placeholder files grouped by concern (e.g., `domain.ts`, `api.ts`) without fully implementing all interfaces; full typing can be fleshed out during Step 8 (Database Schema) and related backend steps.
+  Expected Output:
+* `types/` directory exists at the repository root (or other agreed central location) containing at least:
+
+  * `types/domain.ts`
+  * `types/api.ts`
+* Both frontend and backend projects are configured to see this folder (via relative imports for now; path aliases can be added later if needed).
+  Testing Instructions:
+* In `frontend/app/dashboard/page.tsx` (or another page), temporarily import a dummy type from `../../types/domain` (or appropriate relative path) and ensure TypeScript compiles. Then remove the test import to keep pages clean.
+* Run `npm run build` in both `frontend/` and `backend/` and verify no module resolution errors related to `types/`.
+  Dependencies:
+* Step 1.1 — Initialize GitHub Repository & Base Directories (root repo established).
+* Step 1.2 & 1.5 — Frontend and backend workspaces initialized.
+
+---
+
+Step 2.6 — Align Frontend & Backend Imports with New Structure (Minimal Verification)
+Description:
+
+* Add one or two minimal “smoke test” imports in safe places (e.g., importing a placeholder function or type) to ensure the new `lib`, `server/api`, and `types` structures are correctly wired and usable from both frontend and backend codebases.
+* This is not about implementing logic; it’s purely to verify that folders and module paths behave as expected.
+  Expected Output:
+* At least one frontend file (e.g., `frontend/app/dashboard/page.tsx`) successfully imports from `frontend/lib/utils` and/or from `types/domain` and compiles.
+* At least one backend file (e.g., a placeholder handler in `backend/server/api/dashboard`) imports a type from `types/api` and compiles.
+* After verification, you may keep or remove these temporary references, as long as future imports will work.
+  Testing Instructions:
+* Run `npm run build` or `npm run lint` in both `frontend/` and `backend/`.
+* Confirm there are no TypeScript or module resolution errors.
+  Dependencies:
+* Step 2.3 — Create Frontend `/lib` Domain Folders.
+* Step 2.4 — Create Backend `/server/api` Endpoint Folder Structure.
+* Step 2.5 — Create Shared `/types` Folder for Domain & API Interfaces.
+
+---
+
+Step 2.7 — Human Review & Approval of Folder / Route Structure
+Description:
+
+* Perform the “HUMAN REQUIRED” review defined in the Steps Document: walk through the new `/app/*` routes, `/lib` folders, `/server/api` structure, and `/types` folder to confirm they align with the Master Document’s functional modules and naming.
+* Make any small renames (if needed) so that future Steps (navigation, backend scaffolding, DB schema) won’t require structural refactors.
+  Expected Output:
+* A short written note (e.g., in `buildlog.md` or a separate doc) confirming that Step 2’s structure is approved or listing any minor adjustments made during review.
+* Repository structure is stable and agreed upon as the base for all subsequent steps.
+  Testing Instructions:
+* Open the repo in your IDE and visually inspect:
+
+  * `frontend/app/*` routes
+  * `frontend/lib/*` domain folders
+  * `backend/server/api/*` structure
+  * `types/*`
+* Confirm that each functional area from the Master Document (Dashboard, Transactions, Documents, VAT, Cashflow, Chat CFO, Settings, Admin, Migration) has a clear home.
+* Optionally run `git status` and commit with a message like `chore: add folder & file structure (step 2)` once you are satisfied.
+  Dependencies:
+* Step 2.1–2.6 completed.
+* Step 1.11 — Connect GitHub Repository to Vercel and Configure Environment (so future commits auto-deploy against this structure).

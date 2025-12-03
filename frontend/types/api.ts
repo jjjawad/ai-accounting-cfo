@@ -1,2 +1,2 @@
 // Placeholder for shared API request/response interfaces
-export interface PlaceholderAPIType {}
+export type PlaceholderAPIType = Record<string, unknown>;

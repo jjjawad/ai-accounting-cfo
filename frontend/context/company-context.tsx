@@ -11,16 +11,13 @@ type CompanyContextValue = {
 const CompanyContext = createContext<CompanyContextValue | undefined>(undefined);
 
 export function CompanyProvider({ children }: { children: React.ReactNode }) {
-  const [companyId, setCompanyId] = useState<string | null>(null);
-
-  useEffect(() => {
+  const [companyId, setCompanyId] = useState<string | null>(() => {
     try {
-      const stored = localStorage.getItem("companyId");
-      if (stored) setCompanyId(stored);
-    } catch (e) {
-      // ignore localStorage errors
+      return localStorage.getItem("companyId");
+    } catch {
+      return null;
     }
-  }, []);
+  });
 
   useEffect(() => {
     try {
@@ -29,7 +26,7 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
       } else {
         localStorage.removeItem("companyId");
       }
-    } catch (e) {
+    } catch {
       // ignore localStorage errors
     }
   }, [companyId]);
@@ -44,9 +41,10 @@ export function CompanyProvider({ children }: { children: React.ReactNode }) {
 
       const stored = localStorage.getItem("companyId");
       if (!stored) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCompanyId(data[0].id);
       }
-    } catch (e) {
+    } catch {
       // ignore errors
     }
   }, [data, companyId]);

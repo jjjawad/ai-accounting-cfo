@@ -1,0 +1,332 @@
+---
+
+## **STEPS DOCUMENT — AI Accounting & CFO Platform**
+
+**Step 1 — Project Initialization & Environment Setup**
+Goal: Establish the full technical environment, repositories, and API keys required to begin development.
+
+* Initialize Next.js project (frontend) with TypeScript + Tailwind + shadcn.
+* Initialize backend folder for Vercel serverless functions.
+* Create Supabase project, configure database + storage + auth.
+* **HUMAN REQUIRED:**
+
+  * Generate Supabase keys + project URL.
+  * Create .env with Supabase, OpenAI, Google Vision, Resend/Email keys.
+  * Set up Google Cloud Vision API and download credentials.
+  * Create GitHub repo + connect to Vercel for CI/CD.
+
+---
+
+**Step 2 — Folder & File Structure**
+Goal: Create the full skeleton that mirrors the Master Document’s functional modules.
+
+* Create `/app/*` routes: dashboard, transactions, documents, vat, cashflow, chat, settings, admin.
+* Create `/lib` folders: `ai`, `ocr`, `pipeline`, `vat`, `accounting`, `supabase`, `utils`.
+* Create `/server/api/*` structure for all endpoints.
+* Create `/types` folder for shared interfaces.
+* **HUMAN REQUIRED:**
+
+  * Approve final folder structure before code begins (to avoid refactoring later).
+
+---
+
+**Step 3 — Navigation / Routing / Shell**
+Goal: Enable movement between blank screens and global layout.
+
+* Implement app shell layout with sidebar navigation.
+* Set up company-switcher UI in the header.
+* Create base navigation between all routes.
+* Configure protected routes requiring Supabase auth session.
+* **HUMAN REQUIRED:**
+
+  * Confirm navigation structure and naming (Dashboard, Books, VAT, Cashflow, Chat, Settings).
+
+---
+
+**Step 4 — Core UI Layouts (Static)**
+Goal: Build all major screens using empty placeholders.
+
+* Dashboard static layout with cards + empty charts.
+* Transactions table skeleton.
+* Documents page layout with drag-and-drop area.
+* VAT static cards + summary mock sections.
+* Cashflow forecast UI skeleton.
+* Chat CFO static chat interface.
+* Settings forms without backend.
+* Admin screens static (companies list, review queue).
+* **HUMAN REQUIRED:**
+
+  * Approve UI skeleton before data binding begins.
+
+---
+
+**Step 5 — State Management Setup**
+Goal: Wire React Query + minimal client state.
+
+* Configure React Query provider, caching strategies.
+* Set up company context provider (selected company stored globally).
+* Initial data fetching structure for authenticated pages.
+* **HUMAN REQUIRED:**
+
+  * Confirm expected lifetime of cached data (e.g., 5 min, 1 hour).
+
+---
+
+**Step 6 — Mock Logic and Local Interactions**
+Goal: Make the UI feel alive with mock data + temp flows.
+
+* Fake income/expense charts to validate layout.
+* Fake transactions list and filtering.
+* Fake VAT summary card.
+* Fake PDC list in cashflow screen.
+* Fake chat messages to test chat UI.
+* No backend calls yet.
+* **HUMAN REQUIRED:**
+
+  * Provide example CSV/receipts/invoices to mock realistic flows.
+
+---
+
+**Step 7 — Backend Scaffolding**
+Goal: Establish all API endpoints and database access layers (even if empty).
+
+* Create API route placeholders for files, transactions, VAT, chat, admin.
+* Add Supabase server client and helper methods.
+* Add authentication middleware.
+* Scaffold n8n inbound/outbound endpoints for workflow triggers.
+* **HUMAN REQUIRED:**
+
+  * Confirm API naming conventions.
+  * Create Supabase role-based policies (RLS) for multi-tenancy.
+
+---
+
+**Step 8 — Database Schema Implementation**
+Goal: Implement ALL tables in Supabase based on the Master Document.
+
+* Create tables: users, companies, memberships, bank_accounts, transactions, documents, vendors, categories, vat_codes, invoices, invoice_line_items, pdc_items, journal_entries, journal_lines, vat_returns, chat_messages, system_logs.
+* Create relationships + indexes.
+* Write RLS policies for `company_id` isolation.
+* Seed default categories + VAT codes.
+* **HUMAN REQUIRED:**
+
+  * Approve chart of accounts structure.
+  * Approve VAT codes + descriptions.
+  * Enter fiscal year + currency defaults.
+
+---
+
+**Step 9 — File Upload → Storage → Pipeline Trigger (Feature #1)**
+Goal: Fully implement ingestion pipeline from upload to OCR trigger.
+
+* Implement `/api/files/upload` storing PDF/images/CSV in Supabase storage.
+* Create file record in DB with status “uploaded”.
+* Trigger n8n or serverless pipeline for processing.
+* Implement `/api/files/:id/process` endpoint.
+* **HUMAN REQUIRED:**
+
+  * Configure n8n webhook URL and API key in .env.
+  * Verify Google Vision API working with test invoice.
+
+---
+
+**Step 10 — OCR Extraction + Document Parsing (Feature #2)**
+Goal: Convert files into structured JSON.
+
+* n8n retrieves file → sends to Google Vision OCR.
+* Store full extracted text in `file.ocr_text`.
+* Use OpenAI for structured document extraction → vendor, date, amount, VAT, line items.
+* Update DB models: create Invoice/Receipt records automatically.
+* **HUMAN REQUIRED:**
+
+  * Review early OCR + extraction accuracy and provide domain corrections for training prompts.
+
+---
+
+**Step 11 — Bank Statement Parsing (Feature #3)**
+Goal: Convert CSV/PDF bank statements into standardized transaction records.
+
+* CSV reader → map columns to internal fields.
+* PDF statements → OCR → parsing via LLM.
+* Write to `bank_transactions` table with `status="raw"`.
+* **HUMAN REQUIRED:**
+
+  * Provide sample CSV formats from Wio, FAB, ADCB, Mashreq, Emirates NBD.
+  * Confirm column mappings.
+
+---
+
+**Step 12 — Categorization Engine (Feature #4)**
+Goal: Fully implement categorization logic.
+
+* Vendor mapping table use.
+* AI-based guessing with confidence scoring.
+* Manual override support.
+* Batch categorization endpoint.
+* Update `category_id`, `vendor_id`, `vat_code_id` on transactions.
+* **HUMAN REQUIRED:**
+
+  * Approve confidence threshold for “needs review” queue.
+  * Approve default vendor mappings for common UAE companies (Du, Etisalat, DEWA, Wio fees).
+
+---
+
+**Step 13 — Reconciliation Engine (Feature #5)**
+Goal: Match invoices/receipts and PDCs to bank transactions.
+
+* Matching rules: amount, date window, vendor similarity.
+* Partial payments handling.
+* PDC clearance status update.
+* Flag unmatched items.
+* **HUMAN REQUIRED:**
+
+  * Confirm matching tolerance (± days, ± AED variance).
+
+---
+
+**Step 14 — VAT Module (Feature #6)**
+Goal: Automate UAE VAT classification + reporting.
+
+* Assign VAT codes from categories/invoices.
+* Calculate input/output VAT by period.
+* Generate VAT summary + exportable filing pack.
+* **HUMAN REQUIRED:**
+
+  * Provide your domain knowledge for edge VAT scenarios (imports, reverse charge, exemptions).
+  * Approve VAT filing pack export format.
+
+---
+
+Step X — Historical Data Migration Engine
+Goal: This is the brain that lets existing businesses join you without destroying consistency.
+
+Build UI for selecting migration method
+Build backend pipeline
+Build import wizard
+Build mapping engine
+Build validation screen
+Build ledger locking mechanism
+
+**Step 15 — Cashflow Forecasting (Feature #7)**
+Goal: Implement forecasting + runway logic.
+
+* Pull historical cash movements.
+* Build simple projection model.
+* Include PDC future events.
+* Save snapshots to DB.
+* **HUMAN REQUIRED:**
+
+  * Approve forecasting assumptions (months considered, smoothing rules).
+
+---
+
+**Step 16 — Dashboard Data Aggregation**
+Goal: Provide clean backend endpoints for dashboard metrics.
+
+* `/dashboard/overview` with aggregated cards.
+* `/dashboard/charts` for income vs expense trends.
+* Implement caching layer for performance.
+* **HUMAN REQUIRED:**
+
+  * Validate accuracy of generated P&L and cashflow charts manually with small dataset.
+
+---
+
+**Step 17 — AI Chat CFO (Feature #8)**
+Goal: Implement chat + SQL agent safely.
+
+* Chat interface integrated with endpoint `/api/chat`.
+* Natural language → SQL conversion with validation.
+* Run only safe SELECT queries.
+* Generate explanations + chart data.
+* Store chat history in DB.
+* **HUMAN REQUIRED:**
+
+  * Approve prompt for SQL generation.
+  * Provide example queries to train/test (marketing spend, runway, supplier ranking).
+  * Confirm tone of responses.
+
+---
+
+**Step 18 — Internal Admin Console**
+Goal: Build full operator tools.
+
+* Admin dashboard: list companies + high-level stats.
+* Review queue: all low-confidence items.
+* Logs viewer: ingestion/OCR/errors/AI outputs.
+* Rules management: vendor → category/VAT mapping.
+* **HUMAN REQUIRED:**
+
+  * Configure admin account privileges.
+  * Approve admin UI design + workflows.
+
+---
+
+**Step 19 — Data Persistence, Journals & Accounting Backbone**
+Goal: Convert all transactions to journal entries (double-entry).
+
+* Every categorized transaction → journal entry + journal lines.
+* Invoices → journalization rules.
+* PDC clearing → journal entries.
+* VAT → journal entries.
+* **HUMAN REQUIRED:**
+
+  * Approve double-entry mapping rules for categories.
+  * Validate sample journals manually.
+
+---
+
+**Step 20 — Error Handling, Validation & Edge Cases**
+Goal: Make the system stable, predictable, and trustworthy.
+
+* Implement error banners, fallback UI states.
+* Add retry logic for OCR failures.
+* Add email alerts for pipeline failures.
+* Ensure PDC, VAT, and cashflow handle edge cases gracefully.
+* **HUMAN REQUIRED:**
+
+  * Approve error messaging and user-facing warnings.
+
+---
+
+**Step 21 — Notifications & Background Jobs**
+Goal: Add scheduled tasks + reminders.
+
+* n8n cron: daily import checks, VAT deadline reminders.
+* Optional email notifications about missing documents.
+* **HUMAN REQUIRED:**
+
+  * Approve which notifications are essential vs optional.
+
+---
+
+**Step 22 — UI/UX Polish & Refinement**
+Goal: Make the product visually clean, intuitive, and professional.
+
+* Improve spacing, typography, responsiveness.
+* Add skeleton loaders, transitions.
+* Refine charts + colors.
+* Fix small usability issues.
+* **HUMAN REQUIRED:**
+
+  * Final UI polish approval.
+
+---
+
+**Step 23 — Final QA & Launch Preparation**
+Goal: Ensure platform stability and correctness.
+
+* Test all ingestion flows with real files.
+* Test VAT summary with known datasets.
+* Test cashflow projection accuracy.
+* Test chat CFO with many queries.
+* Finalize Supabase policies + backups.
+* Deploy production version on Vercel.
+* **HUMAN REQUIRED:**
+
+  * Perform founder-level UAT using your accounting expertise.
+  * Approve final go-live readiness.
+
+---
+
+This is your full **Steps Document**, fully aligned with the Master Document, structured sequentially, and clearly marking where **your involvement is required** before proceeding to the next stages.

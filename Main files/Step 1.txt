@@ -1,0 +1,181 @@
+Step 1.1 — Initialize GitHub Repository & Base Directories
+Description:
+
+* Create a new GitHub repository for the AI Accounting & CFO platform and clone it locally.
+* Inside the repo, create the top-level `frontend/` and `backend/` folders to mirror the architecture defined in the Master and Steps Documents.
+  Expected Output:
+* A GitHub repo exists and is cloned on your machine.
+* The repo root contains `frontend/` and `backend/` directories committed and pushed.
+  Testing Instructions:
+* Run `git status` to confirm a clean working tree.
+* Open the repo in your IDE and verify `frontend/` and `backend/` exist at the root.
+  Dependencies:
+* None (this is the first sub-step).
+
+---
+
+Step 1.2 — Initialize Next.js TypeScript App in `frontend/`
+Description:
+
+* Use the official Next.js tooling to scaffold a new Next.js app with TypeScript inside the `frontend/` folder, following the chosen stack (Next.js + TypeScript).
+  Expected Output:
+* `frontend/` contains a standard Next.js TypeScript project (package.json, next.config, tsconfig, etc.).
+* Initial dependencies for Next.js and React are installed.
+  Testing Instructions:
+* From `frontend/`, run the dev server (e.g., `npm run dev` or `yarn dev`).
+* Open `http://localhost:3000` and confirm the default Next.js starter page is visible without errors.
+  Dependencies:
+* Step 1.1
+
+---
+
+Step 1.3 — Add Tailwind CSS to the Next.js Frontend
+Description:
+
+* Install and configure Tailwind CSS in the `frontend/` Next.js app according to the official Tailwind + Next.js setup, matching the stack defined in the Master Document (Tailwind + shadcn UI). 
+  Expected Output:
+* Tailwind dependencies are added to `frontend/package.json`.
+* Tailwind config and PostCSS config files exist, and global styles import Tailwind base, components, and utilities.
+  Testing Instructions:
+* Add a simple Tailwind class (e.g., `className="text-2xl"` or `className="bg-slate-100"`) to the main page.
+* Run the dev server and verify the Tailwind styling is applied correctly.
+  Dependencies:
+* Step 1.2
+
+---
+
+Step 1.4 — Install and Configure shadcn UI in Frontend
+Description:
+
+* Install shadcn UI in the `frontend/` project and run its init/setup command so you can generate component primitives later for dashboard cards, tables, etc., as expected by the UI stack.
+  Expected Output:
+* shadcn UI tooling is installed and configured.
+* A basic shadcn component (e.g., `Button`) is generated in the designated components directory.
+  Testing Instructions:
+* Import the generated shadcn `Button` into the main page and render it.
+* Run the dev server and verify the button renders and responds to click without console errors.
+  Dependencies:
+* Step 1.3
+
+---
+
+Step 1.5 — Scaffold Backend Folder for Serverless Functions
+Description:
+
+* Prepare the `backend/` folder as a dedicated workspace for Vercel serverless functions and shared backend utilities, aligned with the architecture (Vercel serverless + Supabase).
+  Expected Output:
+* `backend/` contains at minimum:
+
+  * A `package.json` (backend dependencies placeholder).
+  * A simple `README.md` describing that this folder is for API/serverless logic.
+* The backend folder is committed to the repo.
+  Testing Instructions:
+* Open `backend/package.json` in the IDE to confirm it exists and is valid JSON.
+* Run `npm install` (or your chosen package manager) in `backend/` and confirm it completes without errors.
+  Dependencies:
+* Step 1.1
+
+---
+
+Step 1.6 — Create Supabase Project (DB + Storage + Auth Baseline)
+Description:
+
+* In the Supabase dashboard, create a new project that will serve as the primary database, auth provider, and storage for files, as specified in the Master Document. 
+  Expected Output:
+* A Supabase project exists with a unique project URL.
+* Default Postgres database is provisioned.
+* Supabase Auth and Storage are available in the project (no custom tables yet).
+  Testing Instructions:
+* Log into Supabase and open the new project.
+* Confirm you can see the project URL, auth settings page, and storage section in the UI.
+  Dependencies:
+* Step 1.1
+
+---
+
+Step 1.7 — Configure Supabase Auth & Storage Defaults
+Description:
+
+* Adjust Supabase project settings for basic email/password authentication and create at least one public storage bucket that will later store uploaded files (bank statements, invoices, etc.), consistent with the ingestion and auth design.
+  Expected Output:
+* Email/password auth is enabled in Supabase auth settings.
+* A storage bucket (e.g., `files` or `documents`) exists and is visible in the Storage UI.
+  Testing Instructions:
+* In Supabase’s Auth section, verify email-password sign-in is enabled.
+* In Storage, confirm the bucket appears and allows uploads via the UI.
+  Dependencies:
+* Step 1.6
+
+---
+
+Step 1.8 — Retrieve Supabase Keys and Project URL
+Description:
+
+* From the Supabase dashboard, copy the project URL and relevant keys (anon/public key and service role key) needed by the frontend and backend, as required by the Steps Document’s environment setup. 
+  Expected Output:
+* A secure note (password manager or local doc) containing:
+
+  * Supabase project URL.
+  * Supabase anon/public key.
+  * Supabase service role key (for backend use only).
+    Testing Instructions:
+* Confirm that these values can be seen again in Supabase if needed.
+* Double-check that they are stored in a secure place (not hard-coded into code files).
+  Dependencies:
+* Step 1.6
+
+---
+
+Step 1.9 — Set Up External API Providers (OpenAI, Google Vision, Email)
+Description:
+
+* Ensure accounts/projects exist for OpenAI, Google Cloud Vision, and your transactional email provider (e.g., Resend/SendGrid), and obtain the API keys/credentials required by the Master & Steps Documents.
+  Expected Output:
+* Active API keys for:
+
+  * OpenAI (for LLM usage).
+  * Google Cloud Vision (for OCR).
+  * Email provider key (for onboarding/notifications).
+* Service account JSON for Google Vision downloaded and stored securely.
+  Testing Instructions:
+* Log into each provider’s dashboard and verify that the keys/credentials are active.
+* (Optional quick sanity check) Use provider dashboards’ “test” tools to verify the key works.
+  Dependencies:
+* Step 1.1
+
+---
+
+Step 1.10 — Create Local `.env` Files for Frontend and Backend
+Description:
+
+* Create `.env.local` (or equivalent) for the `frontend/` and `.env`/`.env.local` for the `backend/`, wiring in Supabase, OpenAI, Google Vision, and email provider keys as called for in Step 1. 
+  Expected Output:
+* `frontend/.env.local` contains variables like Supabase URL + anon key, and client-safe keys.
+* `backend/.env` (or `.env.local`) contains Supabase service role key and server-only keys (OpenAI, Vision, email), not committed to Git.
+* `.gitignore` excludes `.env*` files.
+  Testing Instructions:
+* Restart the frontend dev server and confirm environment variables are loaded (e.g., log one to the console in a safe dev-only spot).
+* In the backend folder, run a simple script or `node -e "console.log(process.env.YOUR_VAR)"` to confirm env vars are accessible.
+  Dependencies:
+* Step 1.2
+* Step 1.5
+* Step 1.8
+* Step 1.9
+
+---
+
+Step 1.11 — Connect GitHub Repository to Vercel and Configure Environment
+Description:
+
+* In Vercel, create a new project connected to the GitHub repo so that the `frontend/` (and later backend functions) deploy automatically, and configure the same environment variables in Vercel’s project settings.
+  Expected Output:
+* Vercel project is linked to the GitHub repo.
+* Environment variables (Supabase URL/keys, OpenAI, Vision, email provider) are set in Vercel for the appropriate environments (development/preview/production as needed).
+* An initial deployment succeeds (even if it’s just the starter Next.js app).
+  Testing Instructions:
+* Push the latest code to the default branch and confirm Vercel triggers a deployment automatically.
+* Open the Vercel-provided URL and verify the frontend app loads without environment-related errors.
+  Dependencies:
+* Step 1.1
+* Step 1.2
+* Step 1.10

@@ -1,0 +1,190 @@
+Step 6.1 — Create Mock Data Module
+Description:
+
+* Create a dedicated mock data module to hold all temporary front-end-only data structures (overview stats, charts, transactions, VAT summary, PDCs, chat messages) for the current Step.
+* Align mock shapes with the Master Document’s data models (BankTransaction, VatReturn, CashflowSnapshot, etc.) so swapping to real API responses later is straightforward. 
+  Expected Output:
+* A new mock module (e.g. `frontend/lib/mocks.ts` or `frontend/lib/mocks/*`) exporting:
+
+  * `mockOverviewMetrics` (cash, income, expenses, VAT due, runway)
+  * `mockIncomeExpenseSeries` (monthly/weekly points)
+  * `mockTransactions` (10–30 rows)
+  * `mockVatSummary` (current period, totals, breakdown)
+  * `mockPdcItems` (issued/received, scheduled/cleared)
+  * `mockCashflowForecast` (date → projected balance)
+  * `mockChatHistory` (seed conversation)
+* Types/interfaces defined or reused from `/types` where available. 
+  Testing Instructions:
+* Confirm the mock module compiles and exports the expected objects without TypeScript errors.
+* Temporarily import one mock (e.g. `mockOverviewMetrics`) into any page and log it in the console to verify structure.
+  Dependencies:
+* Step 2 (types folder + basic structure).
+* Step 4 (screens created).
+* Step 5 (state setup, though not yet used here).
+
+---
+
+Step 6.2 — Wire Dashboard Summary Cards to Mock Overview Data
+Description:
+
+* Connect the Dashboard top summary cards (cash balance, income, expenses, net result, VAT due, runway) to `mockOverviewMetrics` instead of hard-coded text, so the UI reflects realistic-looking numbers. 
+  Expected Output:
+* Dashboard summary cards read their values from the mock overview object.
+* All cards show non-zero, coherent values (e.g., income > 0, expenses > 0, runway in days).
+* No network/API calls are made; data is imported directly from the mock module or via a simple local hook.
+  Testing Instructions:
+* Load the Dashboard route for a logged-in, company-selected user.
+* Verify each card displays the numbers from `mockOverviewMetrics`.
+* Confirm there are no failed network requests in the browser DevTools Network tab.
+  Dependencies:
+* Step 3 (navigation + shell).
+* Step 4 (Dashboard static cards).
+* Step 6.1 (mock module).
+
+---
+
+Step 6.3 — Populate Dashboard Charts with Mock Income/Expense Series
+Description:
+
+* Connect the Dashboard charts (income vs expenses, cashflow line) to `mockIncomeExpenseSeries` and related mock datasets, validating chart layout, legends, and axes. 
+  Expected Output:
+* Income vs expenses chart shows at least 3–6 time periods with distinct values.
+* Optional cashflow-over-time chart shows projected or historical balances from mock data.
+* Charts handle empty state if mock arrays are empty (but default mocks should be non-empty).
+  Testing Instructions:
+* Open Dashboard and visually verify charts render correctly with the mock data points.
+* Resize the window to ensure charts remain legible and responsive.
+* Confirm again that there are no API calls; chart data comes from the mock module only.
+  Dependencies:
+* Step 4 (Dashboard chart components).
+* Step 6.1 (mock series).
+
+---
+
+Step 6.4 — Wire Transactions Table to Mock Transactions List
+Description:
+
+* Connect the Transactions screen table to `mockTransactions`, so it renders a realistic list of rows aligned with `BankTransaction` shape (date, description, amount, category, VAT, status). 
+  Expected Output:
+* Transactions table shows 10–30 mock rows.
+* Columns display formatted date, description, amount (with +/- styling), category, VAT code, and status.
+* Table uses purely local state or a simple internal hook; no backend fetch.
+  Testing Instructions:
+* Navigate to the Transactions route.
+* Confirm all columns are populated from the mock data.
+* Sort or scroll as designed and verify the correct rows remain visible.
+  Dependencies:
+* Step 4 (Transactions table skeleton).
+* Step 6.1 (mock transactions).
+
+---
+
+Step 6.5 — Implement Local Filtering on Mock Transactions
+Description:
+
+* Hook up date-range and category/status filters on the Transactions screen to work against `mockTransactions` in-memory, proving the filter UI and logic before real APIs exist. 
+  Expected Output:
+* Changing date range updates the rendered subset of `mockTransactions`.
+* Changing category or status filters (e.g., “All / Income / Expense / Raw / Categorized”) updates the table.
+* When no transactions match, an empty-state message appears (“No transactions match this filter. Upload a statement to see data later.”).
+  Testing Instructions:
+* On the Transactions screen, adjust filters step-by-step and verify the visible rows change correctly.
+* Set filters such that zero mock records match and check the empty-state UI.
+* Confirm there are still no network calls.
+  Dependencies:
+* Step 6.4 (table already showing mock data).
+* Step 3 (basic navigation).
+
+---
+
+Step 6.6 — Wire VAT Summary Card and Breakdown Table to Mock VAT Data
+Description:
+
+* Connect the VAT screen’s top summary (output VAT, input VAT, net VAT due) and breakdown table to `mockVatSummary`, following the VAT module structure from the Master Document.
+  Expected Output:
+* VAT summary card displays realistic AED figures for the current mock period.
+* Breakdown table lists at least a few VAT codes (e.g., STANDARD_5, ZERO, EXEMPT) with corresponding totals.
+* “Export Filing Pack” button is present but can remain a disabled or no-op button for this Step.
+  Testing Instructions:
+* Navigate to the VAT screen.
+* Verify totals match the values defined in `mockVatSummary`.
+* Confirm breakdown rows and net VAT due calculations display as expected.
+  Dependencies:
+* Step 4 (VAT static layout).
+* Step 6.1 (mock VAT summary).
+
+---
+
+Step 6.7 — Populate Cashflow Screen with Mock PDC List
+Description:
+
+* Connect the PDC list portion of the Cashflow/CFO screen to `mockPdcItems`, showing scheduled and cleared cheques as described in the PDC feature and Cashflow view sections. 
+  Expected Output:
+* Cashflow screen renders a table or list of PDC items with due date, amount, type (issued/received), and status (scheduled/cleared).
+* Upcoming PDCs (status `scheduled`) are visually distinguished from cleared ones.
+  Testing Instructions:
+* Open the Cashflow/CFO screen.
+* Confirm the PDC list shows the mock PDC entries in the correct order (e.g., sorted by due_date).
+* Verify that types and statuses display correctly (badges, icons, or labels).
+  Dependencies:
+* Step 4 (Cashflow layout with PDC area).
+* Step 6.1 (mock PDC items).
+
+---
+
+Step 6.8 — Wire Cashflow Forecast Chart and Runway Metrics to Mock Forecast Data
+Description:
+
+* Connect the Cashflow forecast chart and runway/burn-rate metrics to `mockCashflowForecast`, mirroring the CashflowSnapshot model and Step 15’s logic at a dummy level. 
+  Expected Output:
+* Forecast chart shows a future time series (e.g., next 30 days) with projected balances.
+* Burn rate and runway labels display values derived from the mock snapshot object.
+* Empty-state handling exists if the series is empty.
+  Testing Instructions:
+* On the Cashflow/CFO screen, verify the chart renders and matches the underlying mock data.
+* Check that runway days and burn rate on-screen match the numbers in `mockCashflowForecast`.
+  Dependencies:
+* Step 4 (Cashflow forecast chart skeleton).
+* Step 6.1 (mock forecast snapshot).
+
+---
+
+Step 6.9 — Seed Chat CFO Screen with Mock Conversation and Local Echo Responses
+Description:
+
+* Populate the Chat CFO UI with `mockChatHistory` and implement a minimal local “send” flow where user messages append to the thread and trigger a fake assistant reply (e.g., from a small hard-coded list or rule) with no backend.
+  Expected Output:
+* When navigating to the Chat screen, an initial mock conversation appears (a few past Q&A messages).
+* Typing a message and hitting send adds a new user bubble and, after a short local timeout or instant, a mock assistant bubble.
+* No network/LLM calls are made; everything is local state.
+  Testing Instructions:
+* Open the Chat CFO screen and scroll; verify the seeded history displays correctly with timestamps/styles.
+* Send a few test messages and confirm they show in the thread with corresponding fake assistant replies.
+* Check DevTools to ensure no chat API calls are attempted.
+  Dependencies:
+* Step 4 (Chat CFO static interface).
+* Step 6.1 (mock chat messages).
+
+---
+
+Step 6.10 — Tie Mock Data to Selected Company Context
+Description:
+
+* Connect the company switcher (from Step 3/5) to the mock data layer so changing the selected company swaps between at least two distinct mock datasets. This validates multi-company behavior before real multi-tenant data exists.
+  Expected Output:
+* Mock module exports data keyed by company id/name (e.g., `mockDataByCompany[companyId]`).
+* Dashboard, Transactions, VAT, Cashflow, and Chat screens all re-render with different mock numbers when another company is selected.
+* No screen still hard-codes a single mock dataset; everything flows through the company context.
+  Testing Instructions:
+* From the header company switcher, toggle between at least two companies.
+* Confirm that:
+
+  * Dashboard cards and charts change values.
+  * Transactions table shows a different mock set.
+  * VAT totals and breakdown change.
+  * Cashflow forecast and PDC list change.
+  * Chat history changes to a different mock conversation.
+    Dependencies:
+* Step 3 (company-switcher UI).
+* Step 5 (company context provider).
+* Step 6.1–6.9 (all screens using mock data).

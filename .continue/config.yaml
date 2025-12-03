@@ -1,0 +1,11 @@
+name: Workspace Config
+version: 1.0.0
+
+workspace:
+  root: "D:\\Booksai\\ai-accounting-cfo"
+
+models:
+  - name: GPT-5
+    provider: openai
+    model: gpt-5
+    apiKey: YOUR_OPENAI_KEY

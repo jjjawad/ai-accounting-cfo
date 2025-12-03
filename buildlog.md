@@ -929,3 +929,233 @@ pm run lint.
 * Notes:
 
   * Backend is now schema-aware; future DB integration will rely on this schema.
+
+### STEP 6.1 — Create Mock Data Module — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/lib/mocks.ts
+* Files MODIFIED:
+
+  * frontend/app/dashboard/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run dev` and loaded `/dashboard`; confirmed `[Step 6.1] mockOverviewMetrics` logs in the browser console with the expected shape and values. Ran `npm run lint` and `npm run build` successfully with no TypeScript or runtime errors.
+* Notes:
+
+  * Central mock data module added for Step 6, covering overview metrics, income/expense series, transactions, VAT summary, PDC items, cashflow forecast, and chat history. Data is not yet wired into the UI; currently imported only for console verification. `buildlog.md` was updated by appending this entry without modifying any existing content.
+
+### STEP 6.2 — Wire Dashboard Summary Cards to Mock Overview Data — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/app/dashboard/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Dashboard summary cards successfully display values from `mockOverviewMetrics`, with no API calls in the Network tab and no console errors.
+* Notes:
+
+  * Static values removed; summary cards now reflect dynamic mock overview data for Step 6. Charts and other pages remain unchanged.
+
+### STEP 6.3 — Wire Income vs Expenses Chart to Mock Data — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/components/dashboard/chart-placeholder.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Income vs Expenses chart now reads directly from `mockIncomeExpenseSeries`. Multiple data points render as a simple SVG line chart with no API calls and no console errors.
+* Notes:
+
+  * Only the Income vs Expenses chart behavior was changed; other charts remain placeholders. No new libraries were added.
+
+### STEP 6.4 — Wire Recent Transactions Table to Mock Data — Completed
+
+* Date: December 3, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/app/dashboard/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Dashboard Recent Transactions table now displays sorted, real mock data from `mockTransactions`. Verified no network calls and no console errors.
+* Notes:
+
+  * Only dashboard transaction preview wired. Full Transactions module wiring happens later in Step 6.10.
+
+### STEP 6.5 — Add `useMockOverview` Hook — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/hooks/use-mock-overview.ts
+* Files MODIFIED:
+
+  * frontend/app/dashboard/_components/SummaryCards.tsx (N/A in this repo; summary cards live in page)
+  * frontend/app/dashboard/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Dashboard summary cards successfully switched to the new `useMockOverview` hook. UI unchanged. No network requests. No console errors.
+* Notes:
+
+  * This step establishes the hook-based data layer needed for Step 7 (API integration). The hook currently returns mock data with isLoading/isError flags set to false.
+
+### STEP 6.6 — Add `useMockIncomeExpense` Hook — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/hooks/use-mock-income-expense.ts
+* Files MODIFIED:
+
+  * frontend/components/dashboard/chart-placeholder.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Chart renders correctly using `useMockIncomeExpense` hook. No API calls, no console errors. Visual output identical to Step 6.3.
+* Notes:
+
+  * Establishes hook-based abstraction for income/expense chart data, preparing Step 7 API integration without UI refactors.
+
+### STEP 6.7 — Add `useMockTransactions` Hook — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/hooks/use-mock-transactions.ts
+* Files MODIFIED:
+
+  * frontend/app/dashboard/_components/RecentTransactions.tsx (N/A in this repo; wired within page)
+  * frontend/app/dashboard/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Dashboard Recent Transactions successfully switched to use `useMockTransactions`. UI unchanged. No API calls. No console errors.
+* Notes:
+
+  * Centralizes dashboard transactions access via a hook, preparing Step 7 API integration without any UI refactor.
+
+### STEP 6.8 — Implement VAT Summary Mock Hook — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/hooks/use-mock-vat-summary.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * VAT Summary mock hook created successfully. No UI changes required for dashboard at this step. No runtime errors and no API calls.
+* Notes:
+
+  * Establishes the VAT data abstraction layer for Step 7 API wiring. VAT module UI wiring occurs later in Step 6.11.
+
+### STEP 6.9 — Implement Cashflow Forecast Mock Hook — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * frontend/hooks/use-mock-cashflow.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Cashflow forecast data is now available via `useMockCashflow`. Dashboard UI unchanged at this step. No API calls. No console errors.
+* Notes:
+
+  * Completes hook-based abstraction for cashflow data on the dashboard in preparation for Step 7 API integration. No cashflow dashboard widget existed to wire in this step.
+
+### STEP 6.10 — Wire Full Transactions Page to Mock Data — Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/components/transactions/table.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Full Transactions page now renders the complete `mockTransactions` list via `useMockTransactions`. No API calls and no console/runtime errors. UI unchanged.
+* Notes:
+
+  * Completes mock data wiring for the full Transactions module; pagination, filters, and API integration will follow in later steps.

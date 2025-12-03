@@ -1,0 +1,247 @@
+Step 4.1 — Dashboard Static Layout (Overview Screen)
+Description:
+
+* Build the static layout for the main Dashboard screen: top summary cards, chart containers, category breakdown section, and insights panel, matching the structure described in the Master Document’s “Dashboard (Overview)” screen. 
+* Use shadcn/Tailwind components to structure cards and chart placeholders, but do not connect any real data or backend calls yet.
+
+Expected Output:
+
+* The `/dashboard` (or equivalent) route displays:
+
+  * A row (or grid) of summary cards for cash balance, income this month, expenses this month, net result, VAT due, and runway.
+  * Empty chart areas for income vs expenses and cashflow over time (e.g., divs with “Chart placeholder”).
+  * A category breakdown section (pie/bar chart placeholder).
+  * An insights panel with static placeholder bullets (e.g., “Insight placeholder 1”).
+
+Testing Instructions:
+
+* Run the dev server and navigate to the Dashboard route.
+* Verify that:
+
+  * All summary cards are visible with sensible placeholder labels.
+  * Chart containers render correctly and resize with the browser window.
+  * Category breakdown and insights sections are clearly separated and visually readable.
+* Confirm there are no console errors and no network calls for real data yet.
+
+Dependencies:
+
+* Step 1 — Project Initialization & Environment Setup. 
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.
+
+Step 4.2 — Transactions Screen Static Table Skeleton
+Description:
+
+* Implement the static layout for the Transactions screen: filters area + table skeleton, aligned with the “Transactions Screen” spec in the Master Document. 
+* Include table headers and a few hardcoded example rows or “No transactions yet” placeholders, without any real data fetching.
+
+Expected Output:
+
+* The `/transactions` (or equivalent) route shows:
+
+  * A filter bar with placeholder controls (date range inputs, category dropdown, status dropdown, search input).
+  * A table with columns for Date, Description, Amount, Category, VAT, Status.
+  * Either 1–2 hardcoded placeholder rows or a single empty-state row (“No transactions for this period”).
+  * A disabled or non-functional “Categorize selected” button at the top or bottom.
+
+Testing Instructions:
+
+* Navigate to the Transactions route via the sidebar.
+* Confirm that the filter bar is visible and aligned above the table.
+* Confirm table headers match the defined columns and layout doesn’t break at common viewport widths.
+* Verify no API/network calls are triggered for transactions yet.
+
+Dependencies:
+
+* Step 4.1 — Dashboard Static Layout (for consistent card/table styling and spacing, if reused).
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.
+
+Step 4.3 — Documents Screen Layout with Drag-and-Drop Area
+Description:
+
+* Create the static layout for the Documents screen, including the upload zone (drag-and-drop + file picker) and a list of document rows/cards, as per the Master Document’s “Documents Screen”. 
+* Implement only UI behaviors (hover states, basic visual feedback); no actual upload logic.
+
+Expected Output:
+
+* The `/documents` route displays:
+
+  * A prominent upload area with text like “Drag and drop bank statements, invoices or receipts here, or click to browse.”
+  * A button or clickable area wired only for visual feedback.
+  * A documents list/table with columns or labels for Type, Date, Vendor, Status.
+  * 1–3 static placeholder items or an empty-state card if you prefer.
+
+Testing Instructions:
+
+* Navigate to the Documents route.
+* Hover and click on the upload zone to ensure it visually responds (e.g., border highlight) but doesn’t trigger real uploads.
+* Verify that the document list area is visible and doesn’t cause horizontal scrolling on normal screens.
+* Check there are no console errors when interacting with the upload area.
+
+Dependencies:
+
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.
+
+Step 4.4 — VAT Screen Static Layout
+Description:
+
+* Build the static layout for the VAT screen with a period selector, summary cards for total output VAT, input VAT, net VAT due, and a placeholder table/section for VAT breakdown, based on the “VAT Screen” description. 
+* No real VAT calculations or backend integration yet—only static values/labels.
+
+Expected Output:
+
+* The `/vat` route shows:
+
+  * A period selector control (dropdown or segmented control) with static options like “Current period” and “Previous period”.
+  * Cards for Total Output VAT, Total Input VAT, Net VAT Due, each showing placeholder numbers (e.g., “AED —”).
+  * A table or list area for VAT breakdown by VAT code/type (“STANDARD 5%”, “ZERO”, etc.) with placeholder rows.
+  * A disabled or non-functional “Export VAT Filing Pack” button.
+
+Testing Instructions:
+
+* Navigate to the VAT route.
+* Confirm period selector is visible and can be toggled visually without changing data.
+* Check that summary cards display placeholder labels and amounts.
+* Verify that the breakdown area is present and stable when resizing the window.
+
+Dependencies:
+
+* Step 4.1 — Dashboard Static Layout (for card styling consistency).
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.
+
+Step 4.5 — Cashflow / CFO Screen Static Forecast UI
+Description:
+
+* Implement the static layout for the Cashflow/CFO screen with chart containers, burn rate/runway summary, and upcoming PDC section, as described in the Master Document’s “Cashflow / CFO Screen”. 
+* Use placeholder data and labels only.
+
+Expected Output:
+
+* The `/cashflow` (or similar) route displays:
+
+  * A main chart container reserved for cashflow forecast (no real chart yet).
+  * Cards or text blocks for “Burn rate” and “Runway” with placeholder values.
+  * A section titled “Upcoming PDCs” with a simple table/list of fake entries or a message “No upcoming PDCs”.
+  * A short static note or info area summarizing “Key cash drivers” with placeholder text.
+
+Testing Instructions:
+
+* Navigate to the Cashflow route.
+* Confirm the primary chart area is clearly visible and sized appropriately.
+* Confirm burn rate and runway sections render clearly and don’t overlap with the chart on smaller screens.
+* Confirm the Upcoming PDCs section is visible and doesn’t cause layout issues.
+
+Dependencies:
+
+* Step 4.1 — Dashboard Static Layout (for card and chart container patterns).
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.
+
+Step 4.6 — Chat CFO Static Interface
+Description:
+
+* Build the static Chat CFO UI: conversation thread, message bubbles, input box, and optional suggestion chips, aligned with the “AI Chat CFO Screen” section in the Master Document. 
+* Include a few static example messages (user + assistant) to demonstrate layout, but no real backend chat yet.
+
+Expected Output:
+
+* The `/chat` (or equivalent) route shows:
+
+  * A scrollable conversation area with at least 2–3 static messages (alternating user/assistant).
+  * Clearly differentiated bubble styles for user vs assistant.
+  * An input textbox with a send button (non-functional).
+  * Optional: a row of suggestion chips such as “Last month’s profit” or “Top expenses this quarter” as static UI.
+
+Testing Instructions:
+
+* Navigate to the Chat route.
+* Confirm the conversation area scrolls correctly if content exceeds viewport height.
+* Confirm input box stays fixed at the bottom while scrolling.
+* Type in the textbox and click “Send” to verify no errors occur (button may be disabled).
+
+Dependencies:
+
+* Step 3 — Navigation / Routing / Shell.
+* Step 2 — Folder & File Structure.
+
+Step 4.7 — Settings Screen Static Forms
+Description:
+
+* Implement static forms and sections for the Settings screen: Company Info, Accounting Settings, and Invitations, according to the “Settings Screen” description in the Master Document. 
+* Fields should be present with labels and inputs, but reading/saving real values is out of scope.
+
+Expected Output:
+
+* The `/settings` route displays:
+
+  * A Company Info section containing inputs for company name, VAT number, fiscal year start, base currency, etc.
+  * An Accounting Settings section with inputs/toggles for default VAT behavior and possibly other basic settings.
+  * An Invitations section with an email input and “Invite user” button (non-functional).
+  * All fields are populated with placeholder or empty values and basic validation messages are NOT yet wired.
+
+Testing Instructions:
+
+* Navigate to the Settings route.
+* Confirm all sections are clearly separated with headings.
+* Interact with inputs and check the UI behaves like a normal form (typing works, no errors).
+* Confirm clicking “Save” or “Invite” buttons does nothing beyond basic visual feedback.
+
+Dependencies:
+
+* Step 3 — Navigation / Routing / Shell.
+* Step 2 — Folder & File Structure.
+
+Step 4.8 — Admin Companies List Static Screen
+Description:
+
+* Create the static Admin “companies list” screen, matching the “Admin Overview Screen” concept but limited to a table of companies and high-level metrics placeholders, as allowed by Step 4 scope. 
+* No real admin logic—just layout for internal operator view.
+
+Expected Output:
+
+* The `/admin/companies` (or similar) route displays:
+
+  * A table with columns like Company Name, Base Currency, Last Activity, No. of Transactions (all placeholder).
+  * A static header or small summary bar at the top (e.g., “Total companies: X (placeholder)”).
+  * 2–3 hardcoded rows to visualize layout.
+
+Testing Instructions:
+
+* Navigate to the Admin companies route (ensure only visible when logged in as an “admin” placeholder or via direct URL for now).
+* Confirm table renders properly and doesn’t overlap with sidebar/header.
+* Verify no backend calls or errors, and that the admin route looks visually distinct from normal client-facing screens.
+
+Dependencies:
+
+* Step 2 — Folder & File Structure (admin route created).
+* Step 3 — Navigation / Routing / Shell (admin navigation item, if already added).
+
+Step 4.9 — Admin Review Queue Static Screen
+Description:
+
+* Implement the static layout for the Admin Review Queue screen with tabs for Transactions vs Documents and a detail pane for the selected item, focusing only on placeholder content. 
+* Prepare UI to later host low-confidence items but do not wire any real data.
+
+Expected Output:
+
+* The `/admin/review` (or similar) route displays:
+
+  * Tabs or segmented controls for “Transactions” and “Documents”.
+  * A master list (left side or top) of placeholder items with fields like Date, Vendor, Amount, Category/VAT guess, Confidence.
+  * A detail area showing more info for a selected placeholder item (e.g., description, suggested category, buttons like “Accept”/“Override” disabled or non-functional).
+
+Testing Instructions:
+
+* Navigate to the Admin review route.
+* Switch between tabs and ensure content updates visually (even if using separate static lists).
+* Click on different placeholder items and verify the detail panel updates to show the corresponding static detail content.
+* Confirm no real API calls are made and no console errors occur.
+
+Dependencies:
+
+* Step 4.8 — Admin Companies List Static Screen (for shared admin layout patterns).
+* Step 2 — Folder & File Structure.
+* Step 3 — Navigation / Routing / Shell.

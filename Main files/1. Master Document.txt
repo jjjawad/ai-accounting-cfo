@@ -1,0 +1,1446 @@
+1. Project Summary
+
+---
+
+This project is an **AI-powered accounting and financial operations platform** for SMEs in the UAE/GCC. It combines automated bookkeeping, VAT preparation, cashflow forecasting, and a conversational “AI CFO” on top of a web dashboard. The system ingests bank statements, invoices, receipts, and PDCs, processes them through an agentic pipeline (OCR + LLMs + rules), and surfaces real-time financial clarity through dashboards and chat.
+
+It is built **for small and medium business owners and operators** (founders, GMs, solo-preneurs, consultants) who do not want to manage accounting complexity but need accurate books, compliant VAT, and forward-looking financial insight. It is also indirectly used by you (as the operator) or future staff as an internal admin tool to review edge cases and maintain quality.
+
+The product solves several problems at once:
+
+* **Operational**: Manual bookkeeping, messy receipts, late reconciliations, missing VAT documentation.
+* **Compliance**: UAE/GCC VAT rules are non-trivial; misclassification can lead to penalties.
+* **Strategic**: Founders rarely have real-time visibility into cashflow, burn, and profitability.
+* **Experience**: Traditional accountants deliver spreadsheets and PDFs, not live dashboards or conversational insight.
+
+The primary platform is a **web application**:
+
+* A **client-facing web app** with dashboard + chat
+* An **internal admin web app** (could be a separate area of the same app)
+* A backend built on serverless endpoints and Supabase, orchestrated with n8n (or similar)
+* Integrations with AI APIs and OCR APIs
+
+Tone/personality for the client-facing product is:
+
+* **Professional but friendly and clear**, not overly playful
+* Emphasis on **trust, reliability, and clarity**
+* Chat CFO answers should sound like a competent, concise CFO who explains things in plain language (not like a jokey chatbot).
+
+2. Users & Use Cases
+
+---
+
+### 2.1 User Types (Personas)
+
+1. **SME Founder / Owner (Digital/Ecom/Agency)**
+2. **Traditional Business Owner / Manager (clinic, salon, trading, services)**
+3. **Consultant / Coach / Influencer (solo or micro business)**
+4. **Internal Operator (You / future staff)**
+5. **(Optional in v1) External Accountant / Partner using the platform for their clients**
+
+### 2.2 Use Cases per Persona
+
+#### 2.2.1 SME Founder / Owner (Digital/Ecom/Agency)
+
+* **Check financial health at a glance**
+
+  * Opens dashboard to see today’s cash balance, income vs expenses this month, profitability, and runway.
+* **Upload monthly bank statements and invoices**
+
+  * Exports CSV/PDF from bank, drags into the app, and expects the system to parse, categorize, and update dashboards.
+* **Upload receipts from ad-hoc expenses**
+
+  * Takes photo of a receipt on phone and uploads via web (later via WhatsApp); expects that expense to appear in the right category.
+* **Understand marketing and operational spend**
+
+  * Asks in the chat: “How much did I spend on marketing in the last 3 months?” or “Compare my cost of goods vs operating expenses this quarter.”
+* **VAT compliance**
+
+  * Checks VAT tab to see how much VAT is due this period, and to download a VAT summary pack for submission.
+* **Detect overspending and trends**
+
+  * Reads AI-generated monthly summary: “Your ad spend increased 22%, but revenue only increased 8%” and uses that to adjust strategy.
+
+#### 2.2.2 Traditional Business Owner / Manager
+
+* **Keep books up to date without hiring a full-time accountant**
+
+  * Regularly uploads bank statements and snaps pictures of purchase invoices; expects the system to keep books current.
+* **Track PDCs**
+
+  * Inputs PDCs (post-dated cheques) details and sees a schedule of upcoming outflows/inflows, plus automatic matching when cheques clear the bank.
+* **VAT filing preparation**
+
+  * Uses VAT tab at the end of each period to export a filing pack prepared based on categorized transactions and invoices.
+* **Check if business is profitable**
+
+  * Opens P&L to see whether the business is actually profitable, not just cash-flow positive.
+
+#### 2.2.3 Consultant / Coach / Influencer
+
+* **Centralize multiple income streams**
+
+  * Uploads statements from multiple accounts/payment processors; wants a single view of monthly income and taxes.
+* **Simple Q&A about finances**
+
+  * Asks: “How much did I earn from coaching in October?” or “How much runway do I have if I maintain the same level of expenses?”
+* **Minimal friction**
+
+  * Doesn’t want to learn accounting. Wants a human-language interface.
+
+#### 2.2.4 Internal Operator (You / future staff)
+
+* **Review and correct low-confidence classifications**
+
+  * Opens an admin view to see transactions/documents flagged with low confidence, updates them manually.
+* **Configure vendor mappings / VAT rules**
+
+  * Manages mapping between vendors and default categories/VAT codes.
+* **Monitor pipelines and errors**
+
+  * Sees logs for ingestion, OCR, classification, and reconciliation; investigates failures.
+* **Onboard new clients**
+
+  * Creates company records, invites new users, configures basic settings (e.g., fiscal year, VAT periods).
+
+#### 2.2.5 External Accountant / Partner (Optional v1)
+
+* **Review books for multiple clients**
+
+  * Has access to multiple companies, can review and export data as needed.
+* **Fix complex edge cases**
+
+  * Adjusts journals where business complexity exceeds automation rules.
+
+3. Full Feature List
+
+---
+
+This is Version 1 **full app** (not minimal MVP) based on our discussions. No speculative extras.
+
+### 3.1 Auth & Multi-Tenancy
+
+1. **User Authentication**
+
+   * Email/password login (Supabase auth).
+   * Password reset.
+   * Basic session handling.
+
+2. **Company Management**
+
+   * Each user belongs to one or more companies.
+   * Ability to create a company profile (name, currency, VAT registration, fiscal year start, etc.).
+   * Switch between companies (for users with multiple companies).
+
+3. **Roles & Permissions**
+
+   * At minimum: Owner, Member, Admin (internal operator).
+   * Company Owner can invite other users to their company.
+
+---
+
+### 3.2 File & Data Ingestion
+
+4. **Bank Statement Upload**
+
+   * UI to upload bank statements as CSV or PDF.
+   * Parsing of CSV into structured transactions.
+   * OCR + parsing for PDF statements (basic bank formats first).
+
+5. **Invoice / Bill / Receipt Upload**
+
+   * UI to upload PDFs/images (drag-and-drop and file picker).
+   * Basic categorization of document type (invoice, receipt, unknown).
+   * OCR and extraction of key fields (vendor, date, amount, VAT, line items).
+
+6. **PDC Input**
+
+   * Form to manually input PDCs: date, amount, bank account, payer/payee, cheque number, type (issued/received).
+   * Optional upload of cheque image for reference.
+
+7. **Document Management**
+
+   * List view of all uploaded documents with status (processed, needs review).
+   * Link documents to underlying transactions.
+
+---
+
+### 3.3 Core Bookkeeping & Ledger
+
+8. **Bank Transactions Storage**
+
+   * Store all parsed bank transactions with basic fields.
+   * Track processing state (raw, categorized, reconciled).
+
+9. **Categorization Engine**
+
+   * Use AI + rules to assign category and GL account to each transaction.
+   * Vendor mapping (learned over time) to auto-suggest categories.
+   * Confidence scoring and flagging low-confidence transactions.
+
+10. **Chart of Accounts**
+
+    * Default SME chart of accounts (customizable at company level).
+    * Mapping from categories to GL accounts.
+
+11. **Journal Entry Model**
+
+    * Store the double-entry representation (JournalEntry + JournalLines) behind all transactions.
+    * Ability for internal operator to post manual adjusting journal entries.
+
+12. **Reconciliation Engine (Basic)**
+
+    * Match bank transactions with invoices/receipts where amounts and dates align.
+    * Update status of transactions (unmatched, matched, partial).
+    * Show unmatched items for review.
+
+---
+
+### 3.4 VAT Automation
+
+13. **VAT Classification**
+
+    * Assign VAT codes to transactions based on category, vendor, and extracted invoice data.
+    * Support basic UAE VAT cases: standard-rated (5%), zero-rated, exempt, out-of-scope, reverse charge (imports).
+
+14. **VAT Summary & Reporting**
+
+    * Compute input and output VAT totals for a period.
+    * Show VAT due/refundable.
+    * Group transaction summaries compatible with typical UAE VAT return forms.
+
+15. **VAT Filing Pack Export**
+
+    * Export a structured VAT report file (PDF and/or CSV) summarizing the VAT position for the period and listing underlying transactions.
+
+---
+
+### 3.5 Cashflow & CFO Intelligence
+
+16. **Cashflow View**
+
+    * Historical cash in/out over time.
+    * Breakdown of major cash sources and uses.
+
+17. **Cashflow Forecast**
+
+    * Simple predictive model based on historical patterns plus PDC schedule and open receivables.
+    * Display expected cash balance over upcoming weeks.
+
+18. **Runway & Burn Metrics**
+
+    * Monthly burn rate estimation based on historical expenses.
+    * Runway estimation: how many days/months until cash reaches zero at current burn.
+
+19. **Monthly CFO Summary**
+
+    * Automatically generated narrative summarizing the month: revenue, profit, key expense movements, VAT position, and simple recommendations.
+
+---
+
+### 3.6 Client Dashboard
+
+20. **Overview Dashboard**
+
+    * Cards for: current cash, income this month, expenses this month, net result, VAT due, runway.
+    * Charts: income vs expenses, cashflow over time, category breakdown.
+    * Insights panel with generated bullet points.
+
+21. **Books Screens**
+
+    * P&L view (selectable period: month, quarter, year, custom).
+    * Balance Sheet view (end of selected period).
+    * Transaction list with filters (date range, category, vendor).
+
+22. **Documents Screen**
+
+    * List/filter documents by type, date, vendor, status.
+    * View document details and extracted fields side-by-side.
+
+23. **VAT Screen**
+
+    * Current VAT period summary.
+    * Detailed breakdown by VAT type.
+    * “Export Filing Pack” button.
+
+24. **Cashflow/CFO Screen**
+
+    * Forecast chart, runway, key CF drivers.
+    * Summary of upcoming PDCs and major expected inflows/outflows.
+
+25. **Settings Screen**
+
+    * Company details (name, VAT number, fiscal year).
+    * Basic accounting settings (currency, COA customization, default VAT behavior).
+    * API/Integration keys (when needed later).
+
+---
+
+### 3.7 AI Chat CFO
+
+26. **Chat Interface**
+
+    * Chat UI for each company: conversation thread with AI CFO.
+    * Ability to ask questions in natural language about financial data.
+
+27. **Basic Q&A**
+
+    * Answer questions like:
+
+      * “How much did I spend on marketing in the last 3 months?”
+      * “What was my net profit last quarter?”
+      * “Who are my top 5 suppliers this year by amount?”
+      * “How much VAT do I owe this period?”
+
+28. **Explained Responses**
+
+    * Responses include numeric answer + brief explanation, and when appropriate, simple text-based tables or chart data for the frontend to render.
+
+---
+
+### 3.8 Internal Admin & Operations
+
+29. **Admin Dashboard**
+
+    * View list of all companies, users, and key metrics (internal only).
+    * Quick links into each company’s low-confidence items and error logs.
+
+30. **Review Queue**
+
+    * List of low-confidence classifications (transactions/documents).
+    * Ability to correct category/VAT manually and re-run affected calculations.
+
+31. **Vendor & Rule Management**
+
+    * Manage vendor mappings to default categories/VAT codes.
+    * Manage basic business rules (e.g., thresholds for capex vs opex).
+
+32. **System Logs Viewer**
+
+    * Access logs of ingestion, OCR, classification, reconciliation, and chat queries for debugging and audit.
+
+---
+
+4. Future Features (Not in this build)
+
+---
+
+These were mentioned or implied as possible later additions but are **explicitly out-of-scope for this Version 1 full app**:
+
+1. **Payroll Automation**
+
+   * Salary processing, WPS file generation, payroll accounting entries.
+
+2. **Corporate Tax Module**
+
+   * Automatic computation of UAE corporate tax, end-of-year tax packs, tax planning scenarios.
+
+3. **Full AP/AR Automation**
+
+   * Automated invoice generation, recurring invoices, automated payment reminders and dunning sequences.
+
+4. **Deeper Bank Integrations / Direct Bank Feeds**
+
+   * Real-time API integration with specific banks instead of relying on CSV/PDF uploads.
+
+5. **Mobile App**
+
+   * Native iOS/Android app. Currently a responsive web app is assumed; a PWA/mobile app can be added later.
+
+6. **Multi-Language Interface**
+
+   * Arabic UI, localization of labels and reports.
+
+7. **Partner/Reseller Portal for Accounting Firms**
+
+   * Full multi-client management and billing for external accountants using the platform for dozens of clients.
+
+8. **Advanced Scenario Modeling**
+
+   * Complex “what if” scenario planners beyond basic forecast tweaks.
+
+9. **Automated Email/WhatsApp-based Notifications for All Events**
+
+   * Fully configurable notification center (advanced rules, preferences).
+
+These should not be implemented now; they are roadmap items once the core product is stable and delivering value.
+
+5. Tech Stack (As Already Decided / Implied)
+
+---
+
+### 5.1 Frontend
+
+* **Framework**: Next.js (React, TypeScript)
+* **Styling**: Tailwind CSS + shadcn UI components
+* **Charts**: Recharts (or similar React charting library)
+* **State Management**: React Query / TanStack Query for server state + basic local state with React hooks. No global complex state library needed initially.
+
+### 5.2 Backend
+
+* **Execution Environment**: Vercel Serverless Functions (or similar serverless environment)
+* **Database**: Supabase (PostgreSQL)
+* **Storage**: Supabase Storage for file uploads (PDFs, images, CSVs)
+* **Auth**: Supabase Auth (email/password, magic link optional)
+
+### 5.3 AI & OCR
+
+* **LLM Provider**: OpenAI (GPT-5.1 Thinking or stable production model like GPT-4.1 for backend usage), used for:
+
+  * Document extraction (structuring OCR text)
+  * Categorization assistance
+  * Chat CFO Q&A and narrative generation
+
+* **OCR Provider**: Google Cloud Vision API (primary)
+
+  * Potential fallback to other OCR if needed later.
+
+### 5.4 Orchestration / Automations
+
+* **Workflow Orchestrator**: n8n (self-hosted or cloud), triggered from backend or webhooks for:
+
+  * File processing pipeline
+  * Periodic tasks (e.g., daily summaries, VAT reminders)
+
+### 5.5 Hosting / Deployment
+
+* **Frontend & API**: Vercel
+* **Database & Storage**: Supabase cloud
+* **n8n**: Self-hosted (e.g., small VPS) or n8n Cloud
+* **CI/CD**: GitHub + Vercel integration for automatic deployments from main branch.
+
+### 5.6 Integrations
+
+* **Email**: transactional email provider (e.g., Resend, SendGrid) for onboarding, notifications.
+* **(Optional later) WhatsApp**: WhatsApp Business API via Twilio or Meta’s Cloud API for document ingestion and notifications.
+
+If there is ambiguity, the assumption is: **choose the simplest cloud-managed offerings**, prioritize speed of development and maintainability.
+
+6. System Architecture
+
+---
+
+### 6.1 High-Level Overview
+
+* The **frontend** (Next.js) renders the client dashboards, forms, file upload UI, and Chat CFO interface. It communicates with the backend via HTTPS calls to Vercel API routes.
+
+* The **backend** comprises serverless functions that:
+
+  * Accept files and store them in Supabase Storage.
+  * Record metadata in Supabase DB.
+  * Trigger external processing via n8n or directly call AI/OCR APIs.
+  * Provide REST/JSON endpoints for frontend queries (e.g., dashboard data, VAT summaries, chat answers).
+
+* **Supabase** acts as:
+
+  * Primary relational database (PostgreSQL) for all structured data (users, companies, transactions, documents, journals, VAT entries, logs).
+  * Auth provider for users.
+  * File storage for raw uploaded documents.
+
+* **n8n** orchestrates multi-step asynchronous pipelines:
+
+  * File ingestion -> OCR -> AI extraction -> DB insert -> classification -> reconciliation.
+  * Scheduled tasks for VAT period checks, forecast updates, etc.
+
+* **AI/OCR providers** are accessed from backend/n8n:
+
+  * Google Vision: convert image/PDF to extracted text.
+  * OpenAI: transform OCR text into structured JSON; assist classification; generate summaries and chat answers.
+
+### 6.2 Text Diagram
+
+Simplified:
+
+```
+[Client Browser]
+   |
+   | HTTPS (Next.js app)
+   v
+[Next.js Pages / React Components]
+   |
+   | fetch()
+   v
+[Vercel API Routes] ----> [Supabase DB]
+       |                      ^
+       |                      |
+       v                      |
+   [Supabase Storage]         |
+       |                      |
+       v                      |
+     (Webhook / n8n Trigger)  |
+       |                      |
+       v                      |
+         [n8n Workflows] ---->|
+             |        \
+             |         \
+     [Google Vision]   [OpenAI LLM]
+```
+
+### 6.3 Business Logic Placement
+
+* **Backend (API routes + n8n)**:
+
+  * Core bookkeeping logic (journal creation, reconciliation, VAT calculations).
+  * AI/OCR interaction orchestration.
+  * Validation and error handling.
+
+* **Frontend**:
+
+  * Purely presentational + light formatting.
+  * Minimal business logic (e.g., date range selections, filters, chart formatting).
+
+No critical accounting or tax logic should live only on the client; it should be centralized in the backend.
+
+7. Data Models
+
+---
+
+(Representative subset; fields may expand during implementation but structure should remain.)
+
+### 7.1 User
+
+```ts
+interface User {
+  id: string;              // UUID
+  email: string;
+  name: string | null;
+  created_at: string;      // timestamp
+  updated_at: string;
+}
+```
+
+### 7.2 Company
+
+```ts
+interface Company {
+  id: string;                  // UUID
+  name: string;
+  base_currency: string;       // 'AED', etc.
+  vat_registered: boolean;
+  vat_number: string | null;
+  fiscal_year_start_month: number; // 1-12
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.3 UserCompany (Membership / Roles)
+
+```ts
+interface UserCompany {
+  id: string;
+  user_id: string;             // FK -> User
+  company_id: string;          // FK -> Company
+  role: 'owner' | 'member' | 'admin';
+  created_at: string;
+}
+```
+
+### 7.4 BankAccount
+
+```ts
+interface BankAccount {
+  id: string;
+  company_id: string;
+  name: string;               // e.g. "Main Wio Account"
+  iban: string | null;
+  currency: string;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.5 BankTransaction
+
+```ts
+interface BankTransaction {
+  id: string;
+  company_id: string;
+  bank_account_id: string;
+  date: string;                 // date only
+  description_raw: string;
+  amount: number;               // positive for inflow, negative for outflow
+  currency: string;
+  balance_after: number | null;
+  source_file_id: string | null; // FK -> File
+  status: 'raw' | 'categorized' | 'reconciled';
+  category_id: string | null;   // FK -> Category
+  vendor_id: string | null;     // FK -> Vendor
+  vat_code_id: string | null;   // FK -> VatCode
+  confidence_score: number | null; // 0-1 for AI classification
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.6 File (Uploaded Document)
+
+```ts
+interface File {
+  id: string;
+  company_id: string;
+  storage_path: string;      // path in Supabase storage
+  type: 'bank_statement' | 'invoice' | 'receipt' | 'pdc' | 'other';
+  original_name: string;
+  mime_type: string;
+  size_bytes: number;
+  ocr_text: string | null;
+  status: 'uploaded' | 'processing' | 'processed' | 'error';
+  error_message: string | null;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.7 Vendor
+
+```ts
+interface Vendor {
+  id: string;
+  company_id: string;
+  name: string;
+  default_category_id: string | null;
+  default_vat_code_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.8 Category
+
+```ts
+interface Category {
+  id: string;
+  company_id: string | null; // null = global default
+  name: string;              // e.g., "Marketing", "Rent"
+  type: 'income' | 'expense' | 'asset' | 'liability' | 'equity';
+  gl_account_code: string;   // e.g. "5000"
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.9 VatCode
+
+```ts
+interface VatCode {
+  id: string;
+  company_id: string | null;
+  code: string;              // e.g., "STANDARD_5", "ZERO", "EXEMPT", "RCM"
+  rate: number;              // 0.05, 0, etc.
+  description: string;
+  recoverable: boolean;
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.10 Invoice
+
+```ts
+interface Invoice {
+  id: string;
+  company_id: string;
+  vendor_id: string | null;
+  file_id: string | null;       // original document
+  invoice_number: string | null;
+  date: string;
+  due_date: string | null;
+  total_amount: number;
+  currency: string;
+  vat_amount: number | null;
+  vat_code_id: string | null;
+  type: 'supplier' | 'customer';
+  status: 'unpaid' | 'part_paid' | 'paid';
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.11 InvoiceLineItem
+
+```ts
+interface InvoiceLineItem {
+  id: string;
+  invoice_id: string;
+  description: string;
+  quantity: number | null;
+  unit_price: number | null;
+  net_amount: number;
+  vat_amount: number | null;
+  category_id: string | null;
+}
+```
+
+### 7.12 PDCItem
+
+```ts
+interface PDCItem {
+  id: string;
+  company_id: string;
+  bank_account_id: string | null;
+  cheque_number: string | null;
+  party_name: string;
+  amount: number;
+  currency: string;
+  issue_date: string | null;
+  due_date: string;
+  type: 'issued' | 'received';
+  status: 'scheduled' | 'cleared' | 'bounced' | 'cancelled';
+  linked_transaction_id: string | null; // FK -> BankTransaction
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.13 JournalEntry & JournalLine
+
+```ts
+interface JournalEntry {
+  id: string;
+  company_id: string;
+  date: string;
+  description: string;
+  source_type: 'bank_tx' | 'invoice' | 'pdc' | 'manual';
+  source_id: string | null; // e.g. BankTransaction.id
+  created_at: string;
+  updated_at: string;
+}
+
+interface JournalLine {
+  id: string;
+  journal_entry_id: string;
+  account_code: string;
+  debit: number;
+  credit: number;
+  vat_code_id: string | null;
+}
+```
+
+### 7.14 VatReturn (Summary)
+
+```ts
+interface VatReturn {
+  id: string;
+  company_id: string;
+  period_start: string;
+  period_end: string;
+  total_output_vat: number;
+  total_input_vat: number;
+  net_vat_due: number;
+  status: 'draft' | 'finalized';
+  created_at: string;
+  updated_at: string;
+}
+```
+
+### 7.15 CashflowSnapshot
+
+```ts
+interface CashflowSnapshot {
+  id: string;
+  company_id: string;
+  as_of_date: string;
+  projected_days: number; // e.g. 30, 60
+  series: any; // JSON blob of date->balance pairs for forecast
+  burn_rate_monthly: number;
+  runway_days: number;
+  assumptions: any; // JSON (for transparency)
+  created_at: string;
+}
+```
+
+### 7.16 ChatMessage
+
+```ts
+interface ChatMessage {
+  id: string;
+  company_id: string;
+  user_id: string | null;      // null = AI
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  created_at: string;
+  metadata: any | null;        // e.g. referenced SQL query, chart data
+}
+```
+
+### 7.17 SystemLog
+
+```ts
+interface SystemLog {
+  id: string;
+  company_id: string | null;
+  level: 'info' | 'warn' | 'error';
+  source: string;              // 'ingestion', 'ocr', 'classification', 'chat', etc.
+  message: string;
+  context: any | null;
+  created_at: string;
+}
+```
+
+8. API Contracts
+
+---
+
+(Representative set, focusing on the main flows.)
+
+### 8.1 Auth
+
+**POST /api/auth/login**
+
+* Request body:
+
+  ```json
+  { "email": "string", "password": "string" }
+  ```
+* Response (200):
+
+  ```json
+  { "user": { "id": "string", "email": "string" }, "accessToken": "string" }
+  ```
+* Error (401/400):
+
+  ```json
+  { "error": "Invalid credentials" }
+  ```
+
+(Actual auth flow will likely use Supabase client, but this placeholder clarifies shape.)
+
+---
+
+### 8.2 Company
+
+**GET /api/companies**
+
+* Returns list of companies user has access to.
+
+**POST /api/companies**
+
+* Request:
+
+  ```json
+  {
+    "name": "string",
+    "base_currency": "AED",
+    "vat_registered": true,
+    "vat_number": "string",
+    "fiscal_year_start_month": 1
+  }
+  ```
+* Response:
+
+  ```json
+  { "company": { ...Company } }
+  ```
+
+---
+
+### 8.3 File Upload & Processing
+
+**POST /api/files/upload**
+
+* Multipart form-data:
+
+  * `file`: binary
+  * `company_id`: string
+  * `type` (optional hint): 'bank_statement' | 'invoice' | 'receipt' | 'pdc'
+* Response:
+
+  ```json
+  { "file_id": "string", "status": "uploaded" }
+  ```
+
+**POST /api/files/:id/process**
+
+* Triggers OCR + extraction + pipeline for this file.
+* Response:
+
+  ```json
+  { "file_id": "string", "status": "processing_started" }
+  ```
+
+---
+
+### 8.4 Transactions
+
+**GET /api/companies/:companyId/transactions**
+
+* Query params:
+
+  * `from` (date), `to` (date), `category_id`, `status`
+* Response:
+
+  ```json
+  {
+    "transactions": [ { ...BankTransaction } ]
+  }
+  ```
+
+**POST /api/companies/:companyId/transactions/categorize**
+
+* Body:
+
+  ```json
+  { "transaction_ids": ["id1", "id2"] }
+  ```
+* Triggers AI categorization for the selected transactions.
+* Response:
+
+  ```json
+  { "status": "queued", "count": 2 }
+  ```
+
+---
+
+### 8.5 VAT
+
+**GET /api/companies/:companyId/vat/summary**
+
+* Query params:
+
+  * `period_start`, `period_end`
+* Response:
+
+  ```json
+  {
+    "company_id": "string",
+    "period_start": "2025-01-01",
+    "period_end": "2025-03-31",
+    "total_output_vat": 12345.67,
+    "total_input_vat": 5432.10,
+    "net_vat_due": 6913.57,
+    "breakdown": [
+      { "vat_code": "STANDARD_5", "output_vat": 10000, "input_vat": 4000 },
+      ...
+    ]
+  }
+  ```
+
+**POST /api/companies/:companyId/vat/returns**
+
+* Body:
+
+  ```json
+  { "period_start": "2025-01-01", "period_end": "2025-03-31" }
+  ```
+* Creates/updates a VatReturn record and returns it.
+
+---
+
+### 8.6 Cashflow & Metrics
+
+**GET /api/companies/:companyId/dashboard/overview**
+
+* Aggregated stats for high-level dashboard cards.
+* Response:
+
+  ```json
+  {
+    "cash_balance": 100000,
+    "income_this_month": 25000,
+    "expenses_this_month": 17000,
+    "net_result_this_month": 8000,
+    "runway_days": 62,
+    "vat_due_current_period": 3200,
+    "insights": [
+      "Marketing spend increased 18% vs last month.",
+      "Net profit margin ~24% this month."
+    ]
+  }
+  ```
+
+**GET /api/companies/:companyId/cashflow/forecast**
+
+* Query params:
+
+  * `days` (default 30)
+* Response:
+
+  ```json
+  {
+    "as_of_date": "2025-12-02",
+    "series": [
+      { "date": "2025-12-03", "projected_balance": 101000 },
+      ...
+    ],
+    "burn_rate_monthly": 18000,
+    "runway_days": 75
+  }
+  ```
+
+---
+
+### 8.7 AI Chat CFO
+
+**POST /api/companies/:companyId/chat**
+
+* Request:
+
+  ```json
+  {
+    "message": "How much did I spend on marketing in the last 3 months?",
+    "context_limit": 90
+  }
+  ```
+* Backend:
+
+  * Constructs prompt including schema / relevant summaries
+  * Optionally generates SQL and executes
+* Response:
+
+  ```json
+  {
+    "assistant_message": "You spent AED 24,350 on marketing in the last 3 months.",
+    "details": {
+      "period_start": "2025-09-01",
+      "period_end": "2025-11-30",
+      "amount": 24350,
+      "chart_data": [
+        { "month": "Sep", "marketing_spend": 7800 },
+        { "month": "Oct", "marketing_spend": 8100 },
+        { "month": "Nov", "marketing_spend": 8450 }
+      ]
+    }
+  }
+  ```
+* Errors:
+
+  ```json
+  { "error": "Unable to answer question safely." }
+  ```
+
+---
+
+### 8.8 Admin / Review
+
+**GET /api/admin/companies/:companyId/review-items**
+
+* Returns low-confidence items needing attention:
+
+  ```json
+  {
+    "transactions": [ ... ],
+    "documents": [ ... ]
+  }
+  ```
+
+**PATCH /api/admin/transactions/:id**
+
+* Body:
+
+  ```json
+  { "category_id": "string", "vat_code_id": "string" }
+  ```
+* Corrects classification and triggers recalculation as needed.
+
+Errors overall follow a consistent pattern:
+
+```json
+{ "error": "Message", "code": "ERROR_CODE", "details": { ...optional } }
+```
+
+9. UI/UX Overview
+
+---
+
+### 9.1 Screens (Client-Facing)
+
+1. **Login / Signup**
+
+   * Purpose: Allow users to authenticate.
+   * Components: email/password form, error messages.
+   * States:
+
+     * Empty: form fields empty.
+     * Loading: showing spinner on form submission.
+     * Error: invalid credentials, password reset error.
+     * Normal: logged in, redirect to company selection or dashboard.
+
+2. **Company Selection / Onboarding**
+
+   * Purpose: Let user choose or create a company.
+   * Components: list of companies, “Create Company” button.
+   * States:
+
+     * Empty: no companies → show onboarding card “Create your first company.”
+     * Loading: fetching companies.
+     * Error: cannot load companies.
+     * Normal: list of existing companies.
+
+3. **Dashboard (Overview)**
+
+   * Purpose: High-level snapshot of company financial health.
+   * Sections:
+
+     * Top summary cards: cash balance, income this month, expenses this month, net result, VAT due, runway.
+     * Charts: line chart of income vs expenses, cashflow over time.
+     * Category breakdown: pie or bar chart.
+     * Insights panel: bullet list of AI-generated insights.
+   * States:
+
+     * Empty: no data yet → show explanations and prompts to upload bank statements.
+     * Loading: skeleton for cards and charts.
+     * Error: message with retry button.
+     * Normal: full metrics.
+
+4. **Transactions Screen**
+
+   * Purpose: Browse and filter all transactions.
+   * Components:
+
+     * Filters (date range, category, status, search).
+     * Table of transactions (date, description, amount, category, VAT, status).
+     * “Categorize selected” button (for manual trigger).
+   * States:
+
+     * Empty: no transactions for selected range; suggest uploading.
+     * Loading: table skeleton.
+     * Error: message.
+     * Normal: list with pagination or infinite scroll.
+
+5. **Documents Screen**
+
+   * Purpose: Manage uploaded documents (bank statements, invoices, receipts).
+   * Components:
+
+     * Upload area (drag-and-drop).
+     * Cards or rows showing documents (type, date, status).
+     * Detail modal: show original file + extracted data side-by-side.
+   * States:
+
+     * Empty: prompt to upload first files.
+     * Loading: skeleton.
+     * Error: message.
+     * Normal: list of documents.
+
+6. **VAT Screen**
+
+   * Purpose: Provide VAT status and filing-ready summaries.
+   * Components:
+
+     * Period selector (current/previous VAT periods).
+     * Total output VAT, input VAT, net due.
+     * Table listing VAT-related transactions or aggregated categories.
+     * Button to export VAT pack.
+   * States:
+
+     * Empty: no VAT data for period.
+     * Loading.
+     * Error.
+     * Normal.
+
+7. **Cashflow / CFO Screen**
+
+   * Purpose: Show forecast and cash management view.
+   * Components:
+
+     * Forecast chart for next X days.
+     * Burn rate and runway.
+     * Upcoming PDC events.
+     * Key drivers summary: e.g., “If your burn stays the same, you will run out of cash on [date].”
+   * States:
+
+     * Empty: not enough data → show guidelines.
+     * Loading.
+     * Error.
+     * Normal.
+
+8. **AI Chat CFO Screen**
+
+   * Purpose: Natural language Q&A about financial data.
+   * Components:
+
+     * Conversation thread (chat bubbles).
+     * Input box.
+     * Optionally quick suggestion prompts (chips like “Last month’s profit,” “Top expenses this quarter”).
+     * Chart or table previews inside assistant responses when relevant.
+   * States:
+
+     * Empty: show onboarding hints: example questions.
+     * Loading: message-level loading for AI response.
+     * Error: message when AI cannot answer.
+     * Normal: conversation history.
+
+9. **Settings Screen**
+
+   * Purpose: Manage company and account-level settings.
+   * Sections:
+
+     * Company Info (name, VAT number, fiscal year).
+     * Accounting Settings (base currency, default VAT behavior).
+     * Invitations (invite users).
+   * States:
+
+     * Empty: simple forms.
+     * Loading: retrieving existing settings.
+     * Error: show error banner when saving fails.
+     * Normal: forms with valid data.
+
+### 9.2 Screens (Internal Admin)
+
+10. **Admin Overview Screen**
+
+    * Purpose: High-level view for operator: list of companies, flagged items, errors.
+    * Components:
+
+      * Table of companies with basic stats (no. of transactions, last activity).
+      * Panel of system logs summary.
+
+11. **Admin Review Queue Screen**
+
+    * Purpose: Fix low-confidence items.
+    * Components:
+
+      * Tabs for Transactions vs Documents.
+      * Detail view for each item showing AI guess + allow manual override.
+
+12. **Admin Logs Screen**
+
+    * Purpose: Debug operational issues.
+    * Components:
+
+      * Logs list with filters (date, level, source).
+      * Detail panel for log context.
+
+13. Logic & Rules
+
+---
+
+### 10.1 Categorization Logic
+
+* Use LLM suggestions but always map final categories to known `Category` records.
+* Vendor-based rules:
+
+  * If vendor has default_category_id, use that unless evidence suggests otherwise.
+* Confidence logic:
+
+  * If LLM classification confidence < threshold (e.g., 0.8), mark transaction as needing review.
+* Category types:
+
+  * Income vs Expense vs Asset vs Liability vs Equity must be consistent with accounting standards.
+
+### 10.2 VAT Logic (High-Level UAE-Oriented)
+
+* For standard-rated supplies (5%):
+
+  * Sales/income transactions: Output VAT = 5% of net amount.
+  * Purchases/expenses: Input VAT = 5% of net amount, if recoverable.
+
+* Zero-rated supplies:
+
+  * VAT rate 0 but still count as taxable supplies for reporting.
+
+* Exempt supplies:
+
+  * No VAT charged, and associated input VAT may not be recoverable depending on rules.
+
+* Out-of-scope:
+
+  * Transactions not within the scope of UAE VAT (e.g., certain foreign transactions).
+
+* Reverse charge mechanism (imports):
+
+  * For identified imports, VAT is calculated as if it were output VAT and then treated as input VAT in the same period (subject to recoverability rules).
+
+VAT classification is **suggested** by the system, but the operator can override. The app must clearly state that final responsibility remains with the business and that the system is assistive, not a tax advisor.
+
+### 10.3 Reconciliation Logic
+
+* Basic matching rules:
+
+  * Match bank transactions and invoices/receipts when:
+
+    * Absolute amounts are equal (possibly within a small tolerance for FX or rounding).
+    * Dates are within a configurable window (e.g., ±7 days).
+    * Vendor names or references are similar (string similarity).
+
+* If multiple potential matches:
+
+  * Prefer the closest date.
+  * If ambiguity persists, leave unmatched and flag for review.
+
+* PDC logic:
+
+  * When a `PDCItem` with status `scheduled` has due_date around a bank transaction date with amount equal and same sign, mark as `cleared` and link them.
+
+### 10.4 Cashflow Forecast Logic
+
+* Simple initial model:
+
+  * Calculate monthly average net cash movement over the last N months (e.g., 3 or 6).
+  * Use this to extrapolate trend forward.
+  * Adjust forecast using known future PDCs and strongly recurring expenses/revenue (e.g., rent, subscriptions identified as recurring).
+
+* Runway calculation:
+
+  * `runway_days = current_cash_balance / (burn_rate_monthly / 30)`
+  * Burn rate monthly derived from average monthly negative cashflow or average monthly expenses (configurable).
+
+### 10.5 AI Chat CFO Behavior
+
+* All chat answers must be derived from:
+
+  * Direct DB queries (SQL)
+  * Precomputed summaries (e.g., cashflow snapshots, VAT summaries)
+
+* LLM is used for:
+
+  * Translating natural language question → query plan
+  * Formatting results into human-friendly explanations
+
+* Safety rule:
+
+  * Chat MUST NOT execute any mutating queries (INSERT/UPDATE/DELETE).
+  * All queries generated are validated against an allowlist of query templates or patterns.
+
+### 10.6 Validation Rules
+
+* BankTransaction:
+
+  * `amount` cannot be 0.
+  * `date` must be a valid date.
+
+* Invoice:
+
+  * `total_amount` >= 0.
+  * If `vat_amount` present, `vat_amount <= total_amount`.
+
+* PDCItem:
+
+  * `due_date` >= `issue_date` if `issue_date` provided.
+
+* Company:
+
+  * `base_currency` must be valid ISO currency code.
+
+### 10.7 Time Period & Reporting Logic
+
+* Reporting is based on a company’s defined fiscal year start month, but user can choose arbitrary date ranges.
+* VAT periods can be configured (monthly or quarterly initially; simple version is quarterly default).
+
+11. Constraints & Safety
+
+---
+
+### 11.1 Constraints
+
+* **Performance**:
+
+  * The system is expected to handle SMEs first, not enterprise-scale transaction volumes.
+  * Bank statements may contain thousands of rows; we must process them in batches, not in one massive blocking operation.
+  * LLM/OCR calls must be rate-limited and processed asynchronously when dealing with large volumes.
+
+* **Cost**:
+
+  * LLM and OCR usage must be optimized:
+
+    * Reuse results where possible.
+    * Avoid re-OCRing or re-extracting unchanged files.
+    * Summarize and cache frequent aggregate queries for dashboards.
+
+* **Complexity**:
+
+  * Tax and accounting logic should aim for “good enough for typical SMEs” rather than implementing exhaustive IFRS or advanced tax edge cases.
+  * Some complex situations may require manual intervention and disclaimers.
+
+* **Scope**:
+
+  * No attempt to replace full ERP systems.
+  * No in-depth inventory management, project costing, or payroll in v1.
+
+### 11.2 Safety & Compliance
+
+* **Data Privacy & Security**:
+
+  * Company data is strictly isolated; queries must always be scoped by `company_id`.
+  * No cross-company access except for internal admin operations, with strict roles.
+  * All external calls to AI and OCR should avoid sending unnecessary PII where possible and comply with provider policies.
+
+* **LLM Guardrails**:
+
+  * Chat CFO must not give generic tax/legal advice beyond factual statements based on the company’s data.
+  * Include disclaimers: the tool is assistive; final decisions should involve professional advice when necessary.
+  * SQL generation must be constrained to `SELECT` queries only, and validation of query structure is enforced.
+
+* **Accounting & VAT Safety**:
+
+  * Mark system as an aid, not an auditor.
+  * Provide visibility into how numbers were produced: breakdowns, lists of transactions, etc., to enable verification.
+  * Have an “audit trail” via `SystemLog` and journal entries for changes.
+
+* **Content & Abuse**:
+
+  * Chat CFO is focused on financial queries; if user asks unrelated or abusive content, system can respond with a generic “out-of-scope” message.
+
+* **Backups & Reliability**:
+
+  * Use Supabase backup features where available.
+  * Critical operations should log enough context to replay or reconstruct in case of failures.
+
+12. Additional Notes
+
+---
+
+* **Assumption: Single Region Focus Initially**
+
+  * Logic and defaults will assume UAE context (AED base currency, UAE VAT rules). When expanding to other GCC countries, VAT and tax rules will need parameterization.
+
+* **Assumption: Manual Bank Uploads First**
+
+  * Direct bank integrations are out-of-scope for v1. All ingestion relies on manual CSV or PDF uploads. This keeps integration work manageable at early stages.
+
+* **Extensibility Consideration**
+
+  * Data model is designed to be extended:
+
+    * Additional `VatCode`s for other jurisdictions.
+    * Additional `Category` types for more advanced accounting.
+    * Extra modules like corporate tax can be added later without redesigning the whole schema.
+
+* **Developer Experience**
+
+  * Codebase should be organized around clear domains:
+
+    * `/lib/accounting` for journal logic
+    * `/lib/vat` for VAT rules
+    * `/lib/ai` for LLM orchestration
+    * `/lib/ocr` for OCR integration
+  * This will make future sub-step/mission systems easier to generate and run.
+
+* **Your Involvement (High Level, for future Steps doc)**
+
+  * Setting up Supabase project, env variables, and auth keys.
+  * Configuring Google Cloud Vision and OpenAI API keys.
+  * Creating initial default chart of accounts and VAT codes.
+  * Defining acceptable thresholds for AI confidence (e.g., when to flag for review).
+  * Providing domain knowledge for UAE VAT edge cases when implementing the VAT module.
+
+* **Quality & Testing Approach**
+
+  * Start with simple deterministic unit tests for:
+
+    * VAT calculations
+    * Journal entry generation
+    * Forecast logic.
+  * Higher-level integration tests can mock AI responses for stable behavior.
+
+* **Documentation**
+
+  * Maintain a separate README or /docs folder that references this Master Document and links to:
+
+    * Steps Document
+    * Sub-steps
+    * Build log
+  * This Master Document is the source of truth; when implementation deviates, the document should be updated.
+
+13. Data Migration Module
+
+Three import methods
+Migration pipeline
+Mapping engine
+Validation steps
+Ledger reconstruction rules
+Final locking of periods
+This is not optional — this is a core module.
+
+This completes the high-level Master Document for the full app implementation, with all features we’ve discussed and a structure designed to be friendly to your step/sub-step/IDE mission workflow.

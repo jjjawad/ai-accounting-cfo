@@ -1,0 +1,34 @@
+This is the BUILD LOG document structure for a project (e.g., BuildLog.md).
+
+You will manually append a new section each time a sub-step is completed.
+
+-----------------------
+BUILD LOG — <PROJECT NAME>
+-----------------------
+
+### STEP X.Y — <Sub-Step Name> — Completed
+- Date:
+  - The date (and time if you want) when this sub-step was completed.
+- Files CREATED:
+  - List each new file created in this sub-step with its path.
+  - Example: src/screens/ChatScreen.tsx
+- Files MODIFIED:
+  - List each existing file that was changed.
+- Dependencies ADDED:
+  - Any packages or libraries installed in this sub-step.
+  - Example: npm install axios
+- Config changes:
+  - Any changes to config files:
+    - .env
+    - tsconfig
+    - app.json
+    - webpack/metro/next config, etc.
+- Testing result:
+  - Describe what you tested and the result.
+  - Example: "Opened app, clicked Login, navigated to Dashboard. No errors."
+- Notes:
+  - Any extra comments, shortcuts, hacks, or follow-ups needed.
+
+---
+
+(Repeat that whole "STEP X.Y..." block for every sub-step you complete.)

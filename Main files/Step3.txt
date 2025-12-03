@@ -1,0 +1,260 @@
+Below is **Step 3 — Navigation / Routing / Shell**, fully expanded into atomic **Sub-Steps**, following your exact required format.
+
+All sub-steps strictly follow the Master Document  and the Steps Document .
+
+---
+
+# **STEP 3 — Navigation / Routing / Shell (Sub-Steps)**
+
+---
+
+## **Step 3.1 — Create Global App Layout (Shell)**
+
+**Description:**
+Create the root `layout.tsx` for the frontend app — this is the global layout wrapper that all pages share. It includes the main HTML structure, fonts, global providers, and space for sidebar/header. (Structure only — no navigation items yet.)
+
+**Expected Output:**
+
+* A global layout wrapper under `frontend/app/layout.tsx`.
+* Pages render inside a consistent shell.
+
+**Testing Instructions:**
+
+* Run `npm run dev` → visit `/dashboard` and `/transactions` and confirm both share the same base layout.
+* No visual UI yet except empty container.
+
+**Dependencies:**
+
+* Step 2 completed (routes folder exists).
+* Tailwind + shadcn installed (Step 1).
+
+---
+
+## **Step 3.2 — Implement Sidebar Navigation Structure (Static Items Only)**
+
+**Description:**
+Add a sidebar component containing the static navigation items specified in the Steps Document (Dashboard, Transactions, Documents, VAT, Cashflow, Chat, Settings, Admin). No links wired yet.
+
+**Expected Output:**
+
+* `components/sidebar.tsx` containing static nav list.
+* The sidebar visible on all pages via `layout.tsx`.
+
+**Testing Instructions:**
+
+* Start dev server → ensure sidebar appears on all routes with correct item labels.
+
+**Dependencies:**
+
+* Step 3.1
+
+---
+
+## **Step 3.3 — Wire Navigation Links to All Routes**
+
+**Description:**
+Convert sidebar items into `<Link>` components that navigate to the corresponding `/app/*` routes created in Step 2.
+
+**Expected Output:**
+
+* Functional links to:
+
+  * `/dashboard`
+  * `/transactions`
+  * `/documents`
+  * `/vat`
+  * `/cashflow`
+  * `/chat`
+  * `/settings`
+  * `/admin`
+
+**Testing Instructions:**
+
+* Click each sidebar link and confirm the correct placeholder screen loads.
+
+**Dependencies:**
+
+* Step 3.2
+* Step 2.1 / 2.2 (routes exist)
+
+---
+
+## **Step 3.4 — Add Active Navigation State Highlight**
+
+**Description:**
+Implement active route detection using `usePathname()` and highlight the currently active nav item.
+
+**Expected Output:**
+
+* Sidebar visually highlights the active page.
+* Correct highlighting persists on refresh.
+
+**Testing Instructions:**
+
+* Switch between pages; verify highlight updates.
+* Refresh a page (e.g., `/vat`) and ensure highlight is correct.
+
+**Dependencies:**
+
+* Step 3.3
+
+---
+
+## **Step 3.5 — Create Header Component (Top Bar Shell)**
+
+**Description:**
+Add a global header at the top of the app shell. This header will later contain the company switcher, user avatar, and breadcrumbs (but now it's empty).
+
+**Expected Output:**
+
+* `components/header.tsx` created.
+* Header visible across all routes.
+
+**Testing Instructions:**
+
+* Confirm header area appears above page content on `/dashboard`, `/transactions`, etc.
+
+**Dependencies:**
+
+* Step 3.1
+
+---
+
+## **Step 3.6 — Implement Company Switcher UI (Static, No Backend)**
+
+**Description:**
+Create the company switcher dropdown in the header with static placeholder entries (“Company A”, “Company B”), no real Supabase queries yet.
+
+**Expected Output:**
+
+* Dropdown component appears in header.
+* Clicking it expands and shows placeholder company names.
+
+**Testing Instructions:**
+
+* Open dropdown → confirm items appear and interactions work.
+* Not selecting a company changes anything yet.
+
+**Dependencies:**
+
+* Step 3.5
+
+---
+
+## **Step 3.7 — Hook Company Switcher Into URL State (Client-Side Only)**
+
+**Description:**
+Create temporary state where selecting a company sets a client-side state variable (context or useState). No backend or persistent storage yet.
+
+**Expected Output:**
+
+* Selected company visually updates in switcher.
+* Selection persists while navigating between pages.
+
+**Testing Instructions:**
+
+* Select “Company B” → navigate to `/documents` → header should still show “Company B.”
+
+**Dependencies:**
+
+* Step 3.6
+* Step 5 will later replace this with real Supabase-powered session data.
+
+---
+
+## **Step 3.8 — Implement Protected Routes Wrapper (Auth Required)**
+
+**Description:**
+Create a wrapper that checks for a Supabase session. For now, return a placeholder like “Not logged in” if session missing. (Full auth comes later.)
+
+**Expected Output:**
+
+* `components/protected-route.tsx` created.
+* All primary client routes use this wrapper.
+
+**Testing Instructions:**
+
+* Temporarily force the session to null and confirm “Not logged in” message appears on all protected pages.
+* Restore session stub and confirm pages load.
+
+**Dependencies:**
+
+* Step 3.1
+* Supabase client placeholder created in Step 1.7
+
+---
+
+## **Step 3.9 — Apply Protected Route Wrapper to All Client Pages**
+
+**Description:**
+Wrap all client-facing pages (`dashboard`, `transactions`, `documents`, `vat`, `cashflow`, `chat`, `settings`) with the ProtectedRoute component.
+
+**Expected Output:**
+
+* Visiting any of the pages without a session shows “Not logged in.”
+* With mocked session → pages load normally.
+
+**Testing Instructions:**
+
+* Flip session mock true/false and verify behavior across all pages.
+
+**Dependencies:**
+
+* Step 3.8
+* Step 2.1 created the pages.
+
+---
+
+## **Step 3.10 — Create Navigation Structure for Admin Route**
+
+**Description:**
+Admin route should be separated visually and logically from the client-facing routes. This step:
+
+* Adds an admin-specific nav grouping or separator.
+* Applies ProtectedRoute + AdminRole check (placeholder only).
+
+**Expected Output:**
+
+* Admin link grouped under “Admin” section or visually separated.
+* Accessing `/admin` requires placeholder admin role check.
+
+**Testing Instructions:**
+
+* Attempt to access `/admin` with admin=false → see placeholder “Access Denied.”
+* Set admin placeholder to true → page loads.
+
+**Dependencies:**
+
+* Step 3.9
+* Step 2.2 (admin route exists)
+
+---
+
+## **Step 3.11 — Final Human Review of Navigation Structure**
+
+**Description:**
+Perform mandatory HUMAN REQUIRED review (per Steps Document) to confirm:
+
+* Route names & order
+* Sidebar UX
+* Header + company switcher placement
+* Admin separation
+* Protected route behavior
+
+**Expected Output:**
+
+* A short note added to buildlog.md documenting approval.
+* Step 3 officially closed.
+
+**Testing Instructions:**
+
+* Navigate every page manually.
+* Confirm shell feels coherent and matches the Master Document’s UX section.
+
+**Dependencies:**
+
+* All Step 3 sub-steps complete.
+
+---
+
+If you want, I can now generate **Step 4** sub-steps, the **Mission Generator prompt**, or help you implement Step 3.1 immediately.
