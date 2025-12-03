@@ -5,5 +5,8 @@
   "scripts": {
     "dev": "echo \"Backend dev placeholder\"",
     "build": "echo \"Backend build placeholder\""
+  },
+  "dependencies": {
+    "zod": "^4.1.13"
   }
 }
