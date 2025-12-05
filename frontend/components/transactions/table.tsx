@@ -1,10 +1,40 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { MockBankTransaction } from "@/lib/mocks";
 import { useMockTransactions } from "@/hooks/use-mock-transactions";
 
-export default function TransactionsTable() {
-  const { data: transactions } = useMockTransactions();
+type Props = {
+  transactions?: MockBankTransaction[];
+};
+
+export default function TransactionsTable({ transactions: override }: Props) {
+  const { data: mockData } = useMockTransactions();
+  const transactions = override ?? mockData;
+
+  if (!transactions.length) {
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Date</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>VAT</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={6} className="text-center text-muted-foreground">
+              No transactions match this filter. Upload a statement to see data later.
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    );
+  }
   return (
     <Table>
       <TableHeader>

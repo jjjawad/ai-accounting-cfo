@@ -447,3 +447,112 @@ export const mockChatHistory: MockChatMessage[] = [
     created_at: "2025-12-03T08:31:12.000Z",
   },
 ];
+
+export type MockDataset = {
+  overview: MockOverviewMetrics;
+  incomeExpense: MockIncomeExpensePoint[];
+  transactions: MockBankTransaction[];
+  vatSummary: MockVatSummary;
+  pdcItems: MockPdcItem[];
+  cashflow: MockCashflowForecast;
+  chatHistory: MockChatMessage[];
+};
+
+const baseDataset: MockDataset = {
+  overview: mockOverviewMetrics,
+  incomeExpense: mockIncomeExpenseSeries,
+  transactions: mockTransactions,
+  vatSummary: mockVatSummary,
+  pdcItems: mockPdcItems,
+  cashflow: mockCashflowForecast,
+  chatHistory: mockChatHistory,
+};
+
+function scaleNumber(n: number, factor: number) {
+  return Math.round(n * factor);
+}
+
+function buildVariant(companyId: string, factor: number): MockDataset {
+  const overview: MockOverviewMetrics = {
+    cash_balance: scaleNumber(mockOverviewMetrics.cash_balance, factor),
+    income_this_month: scaleNumber(mockOverviewMetrics.income_this_month, factor * 1.05),
+    expenses_this_month: scaleNumber(mockOverviewMetrics.expenses_this_month, factor * 0.95),
+    net_result_this_month: scaleNumber(mockOverviewMetrics.net_result_this_month, factor),
+    vat_due_current_period: scaleNumber(mockOverviewMetrics.vat_due_current_period, factor * 0.9),
+    runway_days: Math.max(30, Math.round(mockOverviewMetrics.runway_days * factor)),
+  };
+
+  const incomeExpense = mockIncomeExpenseSeries.map((pt) => ({
+    ...pt,
+    income: scaleNumber(pt.income, factor * 1.05),
+    expenses: scaleNumber(pt.expenses, factor * 0.95),
+  }));
+
+  const transactions = mockTransactions.map((tx, idx) => ({
+    ...tx,
+    id: `${tx.id}_${companyId}_${idx}`,
+    company_id: companyId,
+    amount: scaleNumber(tx.amount, factor * (tx.amount < 0 ? 1 : 1.05)),
+    vat_code_id: tx.vat_code_id,
+  }));
+
+  const vatSummary: MockVatSummary = {
+    ...mockVatSummary,
+    total_output_vat: scaleNumber(mockVatSummary.total_output_vat, factor * 1.1),
+    total_input_vat: scaleNumber(mockVatSummary.total_input_vat, factor * 0.9),
+    net_vat_due: scaleNumber(mockVatSummary.net_vat_due, factor),
+    breakdown: mockVatSummary.breakdown.map((b) => ({
+      ...b,
+      output_vat: scaleNumber(b.output_vat, factor * 1.05),
+      input_vat: scaleNumber(b.input_vat, factor * 0.95),
+    })),
+  };
+
+  const pdcItems = mockPdcItems.map((pdc, idx) => ({
+    ...pdc,
+    id: `${pdc.id}_${companyId}_${idx}`,
+    company_id: companyId,
+    amount: scaleNumber(pdc.amount, factor),
+  }));
+
+  const cashflow: MockCashflowForecast = {
+    ...mockCashflowForecast,
+    burn_rate_monthly: scaleNumber(mockCashflowForecast.burn_rate_monthly, factor),
+    runway_days: Math.max(30, Math.round(mockCashflowForecast.runway_days * factor)),
+    series: mockCashflowForecast.series.map((pt, idx) => ({
+      ...pt,
+      projected_balance: scaleNumber(pt.projected_balance, factor),
+      date: pt.date,
+    })),
+  };
+
+  const chatHistory = mockChatHistory.map((msg, idx) => ({
+    ...msg,
+    id: `${msg.id}_${companyId}_${idx}`,
+    company_id: companyId,
+    content:
+      idx % 2 === 0
+        ? msg.content.replace("cash", "cash (Company B mock)")
+        : msg.content.replace("mock", "mock (Company B)"),
+  }));
+
+  return {
+    overview,
+    incomeExpense,
+    transactions,
+    vatSummary,
+    pdcItems,
+    cashflow,
+    chatHistory,
+  };
+}
+
+const mockDataByCompany: Record<string, MockDataset> = {
+  comp_0001: baseDataset,
+  comp_0002: buildVariant("comp_0002", 0.75),
+};
+
+export function getMockDataForCompany(companyId: string | null | undefined): MockDataset {
+  if (!companyId) return mockDataByCompany.comp_0001;
+  return mockDataByCompany[companyId] ?? mockDataByCompany.comp_0001;
+}

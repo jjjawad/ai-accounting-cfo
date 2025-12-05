@@ -1,0 +1,99 @@
+Step 17.1 — Define Chat Safety & SQL Allowlist
+Description:
+- Document allowed query patterns/tables for Chat CFO, ensuring read-only scope and company_id filtering. Create allowlist definitions in code.
+Expected Output:
+- Allowlist config module with regex/templates for safe SELECT queries and notes on forbidden mutations.
+Testing Instructions:
+- `npm run lint`; review allowlist to confirm coverage and no mutations allowed.
+Dependencies:
+- Step 8 schema, Master Doc safety rules, Step 7 (backend scaffold).
+
+Step 17.2 — Set Up Chat Context Builder
+Description:
+- Implement builder that gathers minimal context: company summary, recent transactions, key metrics; respects size limits and redacts sensitive fields.
+Expected Output:
+- Function returning structured context object/text for prompts; handles empty data gracefully.
+Testing Instructions:
+- Run builder for a sample company; inspect returned context size and fields.
+Dependencies:
+- Steps 16 (metrics), 11/12 (transactions), 8 schema.
+
+Step 17.3 — Prompt Template for Chat CFO
+Description:
+- Create prompt template instructing assistant tone (professional CFO), safety constraints, and format for responses (answer + brief explanation, optional chart/table data).
+Expected Output:
+- Template string/function stored in code; references allowlist rules and context slots.
+Testing Instructions:
+- `npm run lint`; optionally render prompt with sample context to verify content and token size.
+Dependencies:
+- Step 17.2 context, Master Doc tone/safety.
+
+Step 17.4 — SQL Generation & Validation Pipeline
+Description:
+- Implement pipeline that uses LLM to propose SQL, validates against allowlist, injects company_id filter, and rejects unsafe queries. Use dry-run or EXPLAIN if needed.
+Expected Output:
+- Function returning safe SQL or error; blocked queries logged with reason.
+Testing Instructions:
+- Test with sample questions to produce SQL; verify company_id present; attempt unsafe pattern and ensure rejection.
+Dependencies:
+- Steps 17.1, 17.3, Step 7.2 Supabase client.
+
+Step 17.5 — Execute Safe Query & Format Result
+Description:
+- Run validated SQL, format results into JSON/table-friendly data, and truncate large outputs. Add error handling/timeouts.
+Expected Output:
+- Execution helper returning data rows and metadata (row count, truncation flag).
+Testing Instructions:
+- Run helper with a safe sample query; verify returned rows; test with large dataset to see truncation flag.
+Dependencies:
+- Step 17.4, DB schema populated.
+
+Step 17.6 — Chat Response Composer
+Description:
+- Combine assistant reasoning, SQL results, and context to craft response adhering to tone/format, with short explanation and optional chart/table payload for frontend.
+Expected Output:
+- Function returning `{ message, details }` payload matching chat endpoint contract.
+Testing Instructions:
+- Invoke composer with sample query result; inspect output for tone and structure.
+Dependencies:
+- Steps 17.3–17.5.
+
+Step 17.7 — Chat API Endpoint Implementation
+Description:
+- Replace placeholder `/api/chat` route: validate request, build context, generate SQL, run query, compose response, store conversation in `chat_messages`.
+Expected Output:
+- Endpoint returns assistant message and details; records user and assistant messages in DB with metadata.
+Testing Instructions:
+- `curl` POST with a sample question; verify response JSON and DB chat_messages entries; ensure unauthorized returns 401/403.
+Dependencies:
+- Steps 17.2–17.6, Step 8.11 (chat_messages), Step 7.3/7.4.
+
+Step 17.8 — Frontend Chat Wiring
+Description:
+- Connect Chat UI to new endpoint: send user input, stream or await response, append messages to thread, handle errors gracefully.
+Expected Output:
+- Chat page uses live backend responses; loading indicators show while awaiting; errors surfaced.
+Testing Instructions:
+- Ask sample questions in UI; verify responses appear and thread persists across navigation (if stored); observe Network tab for API calls.
+Dependencies:
+- Step 17.7 backend, Step 4.6 UI, Step 5 hooks.
+
+Step 17.9 — Add Guardrails & Rate Limits
+Description:
+- Implement per-user/company rate limiting and abuse filtering; block unsupported topics with polite message; log violations.
+Expected Output:
+- Rate limit in place (return 429), out-of-scope responses for irrelevant questions, logs for violations.
+Testing Instructions:
+- Send rapid repeated messages to trigger rate limit; ask an irrelevant question to see out-of-scope reply; verify logs.
+Dependencies:
+- Step 17.7, Step 8.11 (logs), Step 17.1 safety rules.
+
+Step 17.10 — Update Build Log & Cleanup
+Description:
+- Add Step 17 notes to `buildlog.md`; remove temporary console logs.
+Expected Output:
+- Build log updated; clean code.
+Testing Instructions:
+- `npm run lint`/`npm run build`; confirm buildlog entry present.
+Dependencies:
+- Steps 17.1–17.9.

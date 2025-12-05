@@ -1,9 +1,9 @@
 import { getMockDataForCompany } from "@/lib/mocks";
 import { useCompany } from "@/context/company-context";
 
-export function useMockIncomeExpense() {
+export function useMockChatHistory() {
   const { companyId } = useCompany();
-  const data = getMockDataForCompany(companyId).incomeExpense;
+  const data = getMockDataForCompany(companyId).chatHistory;
   return {
     data,
     isLoading: false,

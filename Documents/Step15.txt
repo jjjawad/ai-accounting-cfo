@@ -1,0 +1,99 @@
+Step 15.1 — Define Forecast Assumptions & Params
+Description:
+- Create config for forecast horizon (days), smoothing window (months), inclusion of PDCs, and burn-rate calculation method per Master Doc.
+Expected Output:
+- Config module exporting defaults and comments.
+Testing Instructions:
+- `npm run lint`; verify values via temporary log (remove after).
+Dependencies:
+- Step 8 schema, Step 6 mock patterns, Master Doc assumptions.
+
+Step 15.2 — Build Historical Cashflow Aggregator
+Description:
+- Implement service to aggregate historical cash in/out from `bank_transactions`, grouped by month, scoped by company and currency.
+Expected Output:
+- Function returning historical series and average burn/inflow metrics.
+Testing Instructions:
+- Run against sample data; validate sums and averages manually.
+Dependencies:
+- Step 8.6 (transactions), Step 12 categorization (to identify inflow/outflow).
+
+Step 15.3 — Incorporate PDC Schedule into Forecast
+Description:
+- Add PDC adjustments: include scheduled issued/received PDCs into future cashflow timeline.
+Expected Output:
+- Forecast input structure includes PDC events with dates/amounts affecting projected balance.
+Testing Instructions:
+- With sample PDCs, ensure forecast includes their effects on the correct dates.
+Dependencies:
+- Step 8.8 (pdc_items), Step 15.2.
+
+Step 15.4 — Implement Forecast Projection Logic
+Description:
+- Using historical trends and PDC adjustments, generate forward-looking daily/weekly projected balances; compute runway and burn rate.
+Expected Output:
+- Forecast result object with series, burn_rate_monthly, runway_days, assumptions.
+Testing Instructions:
+- Run service on sample dataset; check that projections and runway align with manual expectation.
+Dependencies:
+- Steps 15.2–15.3, Step 14 VAT not directly required.
+
+Step 15.5 — Persist CashflowSnapshot Records
+Description:
+- Save generated forecast into `cashflow_snapshots` table with as_of_date and projected_days for caching/history.
+Expected Output:
+- Snapshot rows stored with company_id; replace/update existing snapshot for same date/horizon.
+Testing Instructions:
+- Generate forecast; verify snapshot inserted/updated in DB; fetch to confirm data.
+Dependencies:
+- Step 8.15 (cashflow_snapshots table from Master Doc; add via migration if missing), Step 15.4.
+
+Step 15.6 — Cashflow Forecast API Endpoint
+Description:
+- Update `/api/cashflow/forecast` to run or fetch latest snapshot; accept optional `days` param; handle cache vs recompute.
+Expected Output:
+- Endpoint returns forecast JSON from snapshot or freshly computed; respects auth.
+Testing Instructions:
+- `curl /api/cashflow/forecast` with auth; verify JSON fields; change `days` param and see adjusted response.
+Dependencies:
+- Steps 15.4–15.5, Step 7.4 (responses), Step 7.3 (auth).
+
+Step 15.7 — Frontend Cashflow Screen Wiring
+Description:
+- Connect Cashflow/CFO page to forecast endpoint; render chart, burn rate, runway, and PDC list using live data with loading/error states.
+Expected Output:
+- UI shows real forecast data; no reliance on mocks when data exists.
+Testing Instructions:
+- Load Cashflow page; confirm network call and rendered values; simulate error to see handling.
+Dependencies:
+- Step 15.6, Step 4.5 UI, Step 5 hooks.
+
+Step 15.8 — Add Refresh/Regenerate Control
+Description:
+- Provide a button to recompute forecast (calls backend to regenerate snapshot) with feedback to the user.
+Expected Output:
+- User can trigger recompute; UI shows loading and refreshed data on success.
+Testing Instructions:
+- Click refresh; verify backend recomputation and new snapshot timestamp/values.
+Dependencies:
+- Steps 15.4–15.7.
+
+Step 15.9 — Logging & Monitoring
+Description:
+- Log forecast generation events and errors to `system_logs` with assumptions and durations.
+Expected Output:
+- Logs created for each generation; errors captured with context.
+Testing Instructions:
+- Generate forecast; check logs entry; induce error to verify error log.
+Dependencies:
+- Steps 15.4–15.6, Step 8.11.
+
+Step 15.10 — Update Build Log & Cleanup
+Description:
+- Document Step 15 in `buildlog.md`; remove temporary logs/mocks.
+Expected Output:
+- Build log updated; clean code.
+Testing Instructions:
+- `npm run lint`/`npm run build`; confirm buildlog entry.
+Dependencies:
+- Steps 15.1–15.9.

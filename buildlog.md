@@ -1137,7 +1137,7 @@ pm run lint.
 
   * Completes hook-based abstraction for cashflow data on the dashboard in preparation for Step 7 API integration. No cashflow dashboard widget existed to wire in this step.
 
-### STEP 6.10 — Wire Full Transactions Page to Mock Data — Completed
+### STEP 6.10 - Wire Full Transactions Page to Mock Data - Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1159,3 +1159,50 @@ pm run lint.
 * Notes:
 
   * Completes mock data wiring for the full Transactions module; pagination, filters, and API integration will follow in later steps.
+
+### STEP 3.11 - Final Human Review of Navigation Structure - Completed
+
+* Date: December 4, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Manually navigated all primary and admin routes; verified sidebar ordering, admin separation, header placement with company switcher/user menu placeholders, and protected route behavior showing Access Denied/Not logged in as expected.
+* Notes:
+
+  * Navigation structure approved for subsequent feature work. No renames needed.
+
+### STEP 5.6 - Implement Supabase Session Loading (Client-Side) - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * frontend/lib/supabase/client.ts
+* Files MODIFIED:
+
+  * frontend/components/protected-route.tsx
+  * frontend/package.json
+  * frontend/package-lock.json
+  * buildlog.md
+* Dependencies ADDED:
+
+  * @supabase/supabase-js
+* Config changes:
+
+  * Added Supabase client factory for frontend auth checks; ProtectedRoute now loads session via Supabase and listens for auth state changes.
+* Testing result:
+
+  * Not run in this step; with env vars absent the UI shows "Not logged in" as expected. Session loading triggers Supabase auth checks when configured.
+* Notes:
+
+  * Auth remains placeholder-friendly until real Supabase credentials are provided. Listener unsubscribes on unmount to avoid leaks.

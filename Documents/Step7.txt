@@ -1,0 +1,145 @@
+Step 7.1 — Add Backend Env Validation Skeleton
+Description:
+- Create a lightweight env loader/validator for the backend (e.g., `backend/utils/env.ts`) that reads required keys noted in the Master/Steps Docs (Supabase URL/keys, OpenAI key, Vision key, n8n webhook URL/key, email key) and throws or logs clear errors if missing. Keep values typed and export a safe config object.
+Expected Output:
+- `backend/utils/env.ts` (or similar) exporting a validated config shape; placeholder values read from process.env with no secrets committed.
+- Backend build succeeds with typed env access instead of ad-hoc `process.env` usage.
+Testing Instructions:
+- Run `npm run lint` or `npm run build` in `backend/`; ensure no type errors.
+- Temporarily unset a required env var and run `npm run build` to confirm a clear error is surfaced (then restore).
+Dependencies:
+- Step 1.10 (.env files exist), Step 5 (frontend state done), prior backend scaffold from Step 1.5.
+
+Step 7.2 — Create Supabase Server Client Helper
+Description:
+- Add a reusable Supabase server client factory (e.g., `backend/lib/supabase-client.ts`) using the validated env config. Include typed exports for service/anon clients per Master Document guidance.
+Expected Output:
+- Supabase client helper file exporting initialized server client(s) ready for API routes.
+- No runtime initialization errors when imported by routes.
+Testing Instructions:
+- Run `npm run lint` or `npm run build` in `backend/`; confirm the helper compiles.
+- Optionally add a temporary import in one route and run build to ensure tree-shaking works (remove after).
+Dependencies:
+- Step 7.1 (env helper), Step 1.7 (Supabase defaults configured).
+
+Step 7.3 — Add Auth Middleware Stub for API Routes
+Description:
+- Create an auth guard utility (e.g., `backend/lib/auth.ts`) that reads a bearer token or Supabase session cookie placeholder and returns a mock user/company context. For now, it should only validate presence and return a stub userId/companyId; real Supabase auth will replace it later.
+Expected Output:
+- Auth helper exporting a function like `requireAuth(request)` returning `{ userId, companyId }` (mock) or throwing an unauthorized error.
+- Centralized error type for unauthorized access.
+Testing Instructions:
+- Add a temporary call in one placeholder route to ensure TypeScript compile passes; run `npm run build`.
+- Manually invoke the route via `npm run dev` + `curl` to see unauthorized vs authorized (using a dummy header).
+Dependencies:
+- Step 7.1 (env), Step 7.2 (Supabase helper ready though not yet used).
+
+Step 7.4 — Add Shared API Response/Error Helpers
+Description:
+- Create small helpers for JSON responses and error shaping (e.g., `backend/utils/responses.ts`) consistent with Master Doc error pattern `{ error: "Message", code: "ERROR_CODE", details: {} }`.
+Expected Output:
+- Exported helpers like `ok(data, init?)`, `badRequest(message, code?)`, `unauthorized()`, `serverError(message, details?)`.
+- Placeholder error codes aligned with Master Doc (no mutation yet).
+Testing Instructions:
+- Import helpers into one placeholder route and run `npm run build`; ensure types are correct.
+- Optional: `npm run dev` and hit the route to see JSON shape.
+Dependencies:
+- Step 7.3 (auth helper), Step 7.1 (env).
+
+Step 7.5 — Scaffold Files API Routes (Upload/Process Placeholders)
+Description:
+- Under `backend/server/api/files/`, add route stubs for `POST /api/files/upload` and `POST /api/files/:id/process` (or Next.js route equivalents). Use response helpers and auth stub; no real storage logic yet—return mocked `file_id` and status per Steps Document Step 9 preview.
+Expected Output:
+- Route files exist and return JSON `{ file_id, status: "uploaded" }` or `{ status: "processing_started" }` with 200 OK when auth header present; 401 otherwise.
+- No storage/DB calls yet.
+Testing Instructions:
+- Run `npm run dev` in `backend/` and `curl` the endpoints with/without dummy auth header; verify responses and status codes.
+- Ensure `npm run lint` passes.
+Dependencies:
+- Step 7.3 (auth), Step 7.4 (responses), Step 2.4 (folders), Step 1.7 (Supabase bucket planned later).
+
+Step 7.6 — Scaffold Transactions API Route Placeholder
+Description:
+- Add `backend/server/api/transactions/index.ts` (or route.ts) returning a mock transactions array matching the Master Doc shape; protect with auth stub. No DB queries yet.
+Expected Output:
+- GET `/api/transactions` responds with an array of mock transactions scoped to the mock companyId.
+- Clear TODO comment for real DB integration and filtering params.
+Testing Instructions:
+- `npm run dev` and `curl /api/transactions` with dummy auth; verify JSON shape matches `BankTransaction` fields.
+- `npm run lint` to ensure typing passes.
+Dependencies:
+- Step 7.3, Step 7.4, Step 2.4 structure, Step 6 mock shapes for reference.
+
+Step 7.7 — Scaffold VAT API Route Placeholder
+Description:
+- Add `backend/server/api/vat/index.ts` route returning a mock VAT summary object per Master Doc (totals + breakdown). Auth-protected, no DB.
+Expected Output:
+- GET `/api/vat/summary` (or similar) returns mock VAT summary JSON with output/input/net VAT and breakdown list.
+- TODO noted for DB calculation in Step 14/16.
+Testing Instructions:
+- `npm run dev` + `curl /api/vat/summary` with dummy auth; verify fields match expected keys.
+- `npm run lint`.
+Dependencies:
+- Step 7.3, Step 7.4, Step 2.4, Step 6 mock VAT shapes.
+
+Step 7.8 — Scaffold Dashboard & Cashflow API Placeholders
+Description:
+- Add routes for `dashboard/overview` and `cashflow/forecast` under `backend/server/api/dashboard/` and `backend/server/api/cashflow/`. Return mock aggregates and mock forecast series aligning with Master Doc.
+Expected Output:
+- GET `/api/dashboard/overview` returns mock card data + insights.
+- GET `/api/cashflow/forecast` returns mock series, burn rate, runway.
+Testing Instructions:
+- `npm run dev` + `curl` both endpoints with dummy auth; confirm JSON keys align with frontend expectations from Steps 4/6.
+- `npm run lint`.
+Dependencies:
+- Step 7.3, Step 7.4, Step 2.4, Step 6 mock structures.
+
+Step 7.9 — Scaffold Chat API Placeholder
+Description:
+- Add `backend/server/api/chat/index.ts` route handling POST with `{ message, companyId }` and returning a mock assistant response per Master Doc safety rules (no mutations). Keep payload validation light (zod optional if already present).
+Expected Output:
+- POST `/api/chat` responds with static assistant message and echoes companyId; rejects missing message with 400.
+- Auth-protected.
+Testing Instructions:
+- `npm run dev` + `curl -X POST` with JSON body and auth; verify response and 400 on empty message.
+- `npm run lint`.
+Dependencies:
+- Step 7.4, Step 7.3, Step 2.4.
+
+Step 7.10 — Scaffold Admin API Placeholders (Companies, Review, Logs)
+Description:
+- Under `backend/server/api/admin/`, add stub routes for companies list, review items, and logs per Master Doc. Gate with an `requireAdmin` placeholder inside auth helper (mock role flag).
+Expected Output:
+- GET `/api/admin/companies` returns mock companies list.
+- GET `/api/admin/review-items` returns mock transactions/documents needing review.
+- GET `/api/admin/logs` returns mock log entries.
+- 403 if `isAdmin` flag absent.
+Testing Instructions:
+- `npm run dev` + `curl` each endpoint with/without admin flag header; verify 403 vs 200.
+- `npm run lint`.
+Dependencies:
+- Step 7.3 (extend auth helper with admin mock), Step 7.4, Step 2.4.
+
+Step 7.11 — Add Migration/N8n Webhook Placeholders
+Description:
+- Add routes under `backend/server/api/migration/` (and/or `backend/server/api/hooks/`) to receive migration uploads and n8n callbacks (e.g., `/api/migration/import` POST) returning accepted/queued statuses. Include TODOs for signature/secret validation per Master Doc.
+Expected Output:
+- Placeholder webhook endpoints responding with `{ status: "queued" }` when called with dummy secret header; 401 otherwise.
+- Clear comments for future signature verification and queue triggers.
+Testing Instructions:
+- `npm run dev` + `curl` the webhook with/without `X-Webhook-Secret` header; verify 200 vs 401.
+- `npm run lint`.
+Dependencies:
+- Step 7.1 (env secret), Step 7.4 (responses), Step 2.4.
+
+Step 7.12 — Add Central API Index/Barrel & Remove Temp Imports
+Description:
+- Optionally add index/barrel files under `backend/server/api/*` to simplify imports (if used by framework), and clean any temporary test imports used during scaffolding. Ensure all routes compile and no unused vars remain.
+Expected Output:
+- Clean, warning-free backend scaffold with all Step 7 routes present and minimal TODOs.
+- No leftover temporary console logs or test code.
+Testing Instructions:
+- Run `npm run lint` and `npm run build` in `backend/`; confirm zero errors/warnings.
+- (Optional) Run a quick smoke `npm run dev` and hit key endpoints to ensure responses still work after cleanup.
+Dependencies:
+- Steps 7.5–7.11 complete.

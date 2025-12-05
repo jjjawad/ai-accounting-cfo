@@ -1,0 +1,89 @@
+Step 19.1 — Define Journal Mapping Rules
+Description:
+- Document rules mapping categories/transactions/invoices to journal entries and lines (accounts, debit/credit) per Master Doc. Include VAT treatment and PDC clearing rules.
+Expected Output:
+- Mapping rules module or doc with clear decision tree for each transaction type.
+Testing Instructions:
+- Review document for coverage and correctness; no code execution needed yet.
+Dependencies:
+- Steps 8.3 (categories/COA), 14 (VAT codes), 13 (reconciliation).
+
+Step 19.2 — Journal Entry Generator for Transactions
+Description:
+- Implement function to generate balanced journal entries from categorized transactions (cash/bank vs category account, VAT line if applicable).
+Expected Output:
+- Function returns journal_entry + journal_lines objects ready for DB insert; validates balance.
+Testing Instructions:
+- Run generator on sample transactions; verify debits = credits; inspect account codes.
+Dependencies:
+- Step 19.1 rules, Step 8.10 journal tables, Step 12 VAT assignment.
+
+Step 19.3 — Journal Generator for Invoices/Receipts
+Description:
+- Create generator for extracted invoices/receipts: AR/AP, revenue/expense, VAT lines; handle status (draft/final).
+Expected Output:
+- Balanced journal payloads based on invoice type; links to invoice_id and file_id.
+Testing Instructions:
+- Generate from sample invoice; ensure balanced lines and correct account selection.
+Dependencies:
+- Step 19.1, Step 8.7 (invoices), Step 8.10 (journal tables).
+
+Step 19.4 — PDC Clearing Journal Logic
+Description:
+- Implement journals for PDC issuance/clearance linking to bank transactions; adjust accounts accordingly.
+Expected Output:
+- Journal entries created when PDC status changes to cleared; links to pdc_item and transaction.
+Testing Instructions:
+- Change a PDC to cleared and verify journal rows created and balanced.
+Dependencies:
+- Step 8.8 (pdc_items), Step 13 reconciliation, Step 19.1 rules.
+
+Step 19.5 — Persist Journals on State Changes
+Description:
+- Hook journal generation into transaction state changes (categorized/reconciled), invoice creation, and PDC clearance. Ensure idempotency to avoid duplicate journals.
+Expected Output:
+- Journals auto-created/updated as statuses change; unique guard prevents duplicates.
+Testing Instructions:
+- Categorize a transaction → verify journal created; re-run categorization → no duplicate; reconcile PDC → journal created.
+Dependencies:
+- Steps 19.2–19.4, Step 12/13 pipelines.
+
+Step 19.6 — Journal APIs (Read-Only)
+Description:
+- Add endpoints to fetch journal entries/lines per company with filters (date, source, account) for UI/admin use.
+Expected Output:
+- GET endpoints returning paginated journal data; auth-protected.
+Testing Instructions:
+- `curl` journals endpoint; verify data and filters; unauthorized returns 401/403.
+Dependencies:
+- Step 8.10 tables, Step 7.4 responses, Step 7.3 auth.
+
+Step 19.7 — Frontend Surfaces for Journals (Admin/Settings)
+Description:
+- Add basic UI to view journal entries (table) in admin or settings area; show filters and link to source transaction/invoice.
+Expected Output:
+- Journal list visible to admin; clickable to source records.
+Testing Instructions:
+- Visit journals view; verify data loads and links work; unauthorized users blocked.
+Dependencies:
+- Step 19.6 backend, Step 18 admin access, Step 5 hooks.
+
+Step 19.8 — Balancing & Validation Checks
+Description:
+- Add automated checks ensuring all journal entries are balanced and reference valid accounts; log any violations.
+Expected Output:
+- Validation routine producing zero imbalance errors; logs created if imbalance detected.
+Testing Instructions:
+- Run validation job; confirm no imbalances; intentionally break one entry to verify detection/logging.
+Dependencies:
+- Steps 19.2–19.5, Step 8.12 constraints.
+
+Step 19.9 — Update Build Log & Cleanup
+Description:
+- Document Step 19 in `buildlog.md`; remove temporary logs/test code.
+Expected Output:
+- Build log updated; clean code.
+Testing Instructions:
+- `npm run lint`/`npm run build`; verify buildlog entry.
+Dependencies:
+- Steps 19.1–19.8.

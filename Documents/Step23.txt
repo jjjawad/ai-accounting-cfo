@@ -1,0 +1,109 @@
+Step 23.1 — Final Test Plan Checklist
+Description:
+- Draft a test checklist covering ingestion, OCR, categorization, reconciliation, VAT, cashflow, chat, admin, and notifications. Include required datasets and expected outcomes.
+Expected Output:
+- Documented checklist (e.g., `docs/final-test-plan.md`) outlining tests and owners.
+Testing Instructions:
+- Review checklist for completeness; no execution yet.
+Dependencies:
+- All prior functional steps.
+
+Step 23.2 — End-to-End Ingestion Test
+Description:
+- Run full flow: upload bank statement → process → parse → categorize → reconcile (if possible) → verify dashboard updates.
+Expected Output:
+- Successful ingestion with transactions in DB, statuses updated, dashboard reflects data.
+Testing Instructions:
+- Perform flow in app; verify UI/DB at each stage; note issues.
+Dependencies:
+- Steps 9–13, 16.
+
+Step 23.3 — Document OCR/Extraction Test
+Description:
+- Upload invoice/receipt → process → OCR/extraction → invoice records created → VAT assigned.
+Expected Output:
+- Invoice/line items present; file status `extracted`; VAT code set.
+Testing Instructions:
+- Upload sample docs; confirm DB entries and UI display in Documents/Transactions; check logs for errors.
+Dependencies:
+- Steps 10, 14.
+
+Step 23.4 — VAT Summary Validation
+Description:
+- Generate VAT summary for a known period and cross-check totals against manual calculation from test data.
+Expected Output:
+- VAT summary matches manual numbers; vat_return row created.
+Testing Instructions:
+- Call VAT summary endpoint/UI; compare values to manual spreadsheet; record discrepancies.
+Dependencies:
+- Step 14, Step 16 overview VAT.
+
+Step 23.5 — Cashflow Forecast Validation
+Description:
+- With sample data and PDCs, run forecast and verify outputs (runway, burn rate) against manual calculation.
+Expected Output:
+- Forecast results align with manual calculation within expected tolerance.
+Testing Instructions:
+- Trigger forecast; compare to manual; log results.
+Dependencies:
+- Step 15.
+
+Step 23.6 — Chat CFO Safety & Accuracy Checks
+Description:
+- Test chat with safe and unsafe prompts; ensure allowlist enforcement, company scoping, and sensible answers for supported questions.
+Expected Output:
+- Safe queries answered correctly; unsafe/irrelevant blocked with out-of-scope messages; no mutations executed.
+Testing Instructions:
+- Send sample questions and out-of-scope prompts; verify responses and DB unchanged.
+Dependencies:
+- Step 17.
+
+Step 23.7 — Admin Flows Verification
+Description:
+- Validate admin dashboards, review queue actions, logs viewer, and manual reconciliation overrides.
+Expected Output:
+- Admin pages load with data; actions update backend; non-admin blocked.
+Testing Instructions:
+- Navigate as admin; perform review/reconcile; ensure changes persist; test non-admin access denial.
+Dependencies:
+- Step 18.
+
+Step 23.8 — Notifications & Background Jobs Check
+Description:
+- Trigger notification workflows (processing failure, VAT reminder, unmatched alerts) and ensure sends/logging work; verify opt-out.
+Expected Output:
+- Emails/logs sent appropriately; opt-out respected.
+Testing Instructions:
+- Simulate triggers; confirm notifications received/logged; toggle opt-out and retest.
+Dependencies:
+- Step 21.
+
+Step 23.9 — Accessibility & Responsiveness Pass
+Description:
+- Perform final accessibility and responsive checks across key screens; ensure keyboard navigation and focus states work.
+Expected Output:
+- Acceptable accessibility behavior; layouts hold on common breakpoints.
+Testing Instructions:
+- Tab through app; use mobile viewport; note any issues.
+Dependencies:
+- Step 22 polish.
+
+Step 23.10 — Final Build, Lint, and Deployment
+Description:
+- Run full lint/build/tests for frontend/backend; deploy to Vercel; verify live environment matches expected behavior.
+Expected Output:
+- Clean CI run; successful Vercel deployment; no blocking errors.
+Testing Instructions:
+- Execute lint/build/test scripts; check Vercel deployment status; smoke test live app.
+Dependencies:
+- All steps complete; CI configured (Step 1.11).
+
+Step 23.11 — Build Log Finalization & Sign-off
+Description:
+- Update `buildlog.md` with Step 23 completion and outstanding risks; capture final notes for launch.
+Expected Output:
+- Build log finalized with summary and TODOs; sign-off note added.
+Testing Instructions:
+- Verify buildlog updated; share with stakeholders for approval.
+Dependencies:
+- Steps 23.1–23.10.

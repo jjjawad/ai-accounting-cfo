@@ -1,0 +1,89 @@
+Step 12.1 — Define Categorization Rules & Confidence Thresholds
+Description:
+- Create a config/constants module specifying confidence thresholds, default categories per vendor patterns, and status transitions (`raw` → `categorized` → `needs_review`).
+Expected Output:
+- Config file exporting thresholds and rule skeletons; documented in code comments.
+Testing Instructions:
+- `npm run lint` to ensure config compiles; verify values read correctly in a temporary log (remove after).
+Dependencies:
+- Step 8.3 (categories), Step 8.4 (vendors), Step 11 (transactions parsed).
+
+Step 12.2 — Build Vendor Mapping Lookup
+Description:
+- Implement vendor lookup that matches transaction descriptions to known vendors (string similarity/contains) and returns default category/VAT code when found.
+Expected Output:
+- Helper function returning vendor match and suggested category/vat_code; handles no-match gracefully.
+Testing Instructions:
+- Run helper against sample descriptions; confirm expected matches; ensure no exceptions.
+Dependencies:
+- Steps 8.4 (vendors table), 12.1 config.
+
+Step 12.3 — Add LLM-Assisted Category Suggestion (Optional)
+Description:
+- Implement an AI helper that, given transaction text and context, returns a category suggestion with confidence. Respect cost controls and fallback to rule-based logic.
+Expected Output:
+- Function returning `{ category_id?, vat_code_id?, confidence }` with error handling and rate-limit guard.
+Testing Instructions:
+- Call helper on a few sample strings (mock responses allowed); ensure structure correct and errors handled.
+Dependencies:
+- Step 7.1 (env OpenAI), Step 12.1 (thresholds), Step 8.3 (categories).
+
+Step 12.4 — Categorization Pipeline for a Transaction Batch
+Description:
+- Implement pipeline that takes uncategorized transactions, applies vendor rules then AI (if enabled), assigns category/vat_code, sets confidence, and determines if review needed.
+Expected Output:
+- Batch function updates transactions in DB with category_id/vat_code_id/status and writes logs for low-confidence items.
+Testing Instructions:
+- Run pipeline on sample uncategorized transactions; verify DB updates and statuses reflect confidence vs threshold.
+Dependencies:
+- Steps 12.2–12.3, Step 8.6 (transactions).
+
+Step 12.5 — Create API Endpoint to Trigger Categorization
+Description:
+- Add `/api/transactions/categorize` POST accepting transaction_ids (or auto-pick uncategorized). Enforce auth and company scope; return counts of categorized vs flagged.
+Expected Output:
+- Endpoint triggers pipeline and responds with summary; respects rate limits and returns 202/200.
+Testing Instructions:
+- `curl` endpoint with sample IDs; verify DB updates and JSON summary; ensure unauthorized requests fail.
+Dependencies:
+- Step 12.4, Step 7.3 (auth), Step 7.4 (responses).
+
+Step 12.6 — Mark Low-Confidence Items for Review Queue
+Description:
+- Insert/update `system_logs` or dedicated flag fields to mark transactions below threshold as `needs_review` for admin UI (Step 18). Store confidence and suggestion details.
+Expected Output:
+- Transactions flagged appropriately; review data visible via admin endpoints.
+Testing Instructions:
+- Run categorization on ambiguous transactions; confirm status `needs_review` and logs/fields populated.
+Dependencies:
+- Step 12.4, Step 8.11 (system_logs).
+
+Step 12.7 — Frontend: Trigger Categorization & Show Status
+Description:
+- Add button/flow on Transactions page to call categorize endpoint for selected/all uncategorized; show loading, success, and errors; update table statuses.
+Expected Output:
+- UI interaction triggers backend categorize; statuses update in table (categorized vs needs review).
+Testing Instructions:
+- Select transactions → click categorize → see request succeed and UI reflect new statuses; errors surface in toast.
+Dependencies:
+- Step 12.5 backend, Step 5 hooks, Step 6 mock replaced by real data.
+
+Step 12.8 — Protect Against Duplicate Categorization
+Description:
+- Add guard to skip already categorized transactions and log skipped count; ensure idempotent operation.
+Expected Output:
+- Re-running categorize on same set leaves data unchanged; summary indicates skipped.
+Testing Instructions:
+- Run categorize twice on same IDs; verify second run reports skipped and no double updates.
+Dependencies:
+- Steps 12.4–12.5.
+
+Step 12.9 — Update Build Log & Clean Temp Code
+Description:
+- Document Step 12 in `buildlog.md`; remove temporary logging/mocks used during categorization development.
+Expected Output:
+- Build log updated; clean codebase.
+Testing Instructions:
+- `npm run lint`/`npm run build` pass; buildlog contains Step 12 entry.
+Dependencies:
+- Steps 12.1–12.8.

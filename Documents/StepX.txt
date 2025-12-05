@@ -1,0 +1,109 @@
+Step X.1 — Design Migration Methods & UI Flow
+Description:
+- Document supported import methods (CSV, XLSX, custom template) and the wizard flow (upload → mapping → validation → review → lock) per Master Doc. Create a short spec in `docs/` or code comments for the wizard screens.
+Expected Output:
+- Written design/spec outlining steps, required fields, and validation rules.
+Testing Instructions:
+- Review doc for completeness and alignment with Master Doc; no code execution needed.
+Dependencies:
+- Steps 2 (routes) and 4 (UI skeleton) for future wiring.
+
+Step X.2 — Create Migration API Endpoint Skeletons
+Description:
+- Add backend routes under `api/migration/` for upload, mapping fetch/save, validation run, and finalize. Use response helpers and auth/admin guard.
+Expected Output:
+- Route files returning placeholder JSON, ready for implementation.
+Testing Instructions:
+- `npm run lint/build`; `curl` endpoints to see placeholder responses.
+Dependencies:
+- Step 7.11 placeholder hooks, Step 7.4 (responses), Step 7.3 (auth).
+
+Step X.3 — Implement Migration Upload Handler
+Description:
+- Accept migration file upload (CSV/XLSX) with company_id; store in storage, create `files` record flagged as `migration`, and return file_id.
+Expected Output:
+- Upload route saves file and returns metadata; file row created with type `migration`.
+Testing Instructions:
+- Upload a sample migration file; verify storage object and DB file row.
+Dependencies:
+- Step 9 (upload pipeline), Step 8.5 (files table).
+
+Step X.4 — Parse Migration File Into Staging Table
+Description:
+- Create staging tables (e.g., `migration_staging_transactions`) and parser to load CSV/XLSX rows into staging with raw values and detection flags.
+Expected Output:
+- Staging rows inserted with validation flags; schema includes company_id, file_id, row_number, detected fields.
+Testing Instructions:
+- Run parser on sample file; query staging table for row counts and flag values.
+Dependencies:
+- Step X.3, Step 8 (schema; add staging via migration).
+
+Step X.5 — Implement Mapping Engine (Columns → Fields)
+Description:
+- Provide API to list detected columns and allow mapping to target fields (amount, date, description, VAT code, category). Save mappings per file/company.
+Expected Output:
+- Endpoint returns detected columns and saves user-selected mappings in DB (mapping table).
+Testing Instructions:
+- Call mapping endpoint to fetch columns; post a mapping selection; verify stored mapping row.
+Dependencies:
+- Step X.4 staging data, Step 8 (add mapping table).
+
+Step X.6 — Validation Pass & Error Reporting
+Description:
+- Run validation using mappings: check required fields, date format, non-zero amounts, currency presence. Mark invalid rows with reasons; produce summary counts.
+Expected Output:
+- Staging rows updated with validation status; API returns summary (valid/invalid counts, sample errors).
+Testing Instructions:
+- Execute validation on sample file; confirm counts and error messages stored/returned.
+Dependencies:
+- Step X.5 mappings, Step 8 staging tables.
+
+Step X.7 — Preview & User Adjustments API
+Description:
+- Provide endpoint to fetch paginated preview of staged/validated rows with errors for manual correction (optional editing of mapped values).
+Expected Output:
+- Preview API returning rows and validation flags; accepts minor edits and saves back to staging.
+Testing Instructions:
+- Call preview endpoint; modify a row via API; verify update and validation status change.
+Dependencies:
+- Step X.6, Step 8 staging tables.
+
+Step X.8 — Commit Migration to Production Tables
+Description:
+- Move validated rows into production tables (transactions, invoices, etc.) with journal hooks disabled/enabled per flag; set file status to completed and lock staging.
+Expected Output:
+- Production rows inserted; staging marked committed; file status updated; audit logs recorded.
+Testing Instructions:
+- Run commit on validated staging data; verify production tables contain new rows and staging marked locked; check logs.
+Dependencies:
+- Steps X.6–X.7, Step 8 prod tables, Step 9.9 logging.
+
+Step X.9 — Lock Period & Prevent Edits
+Description:
+- After migration commit, lock affected periods/rows to prevent re-import conflicts; set flags in a `migration_lock` table.
+Expected Output:
+- Locked periods recorded; APIs respect lock by rejecting overlapping imports/edits.
+Testing Instructions:
+- Attempt re-import for same period/company; expect rejection; verify lock table entry.
+Dependencies:
+- Step X.8, Step 8 (lock table schema as needed).
+
+Step X.10 — Update Admin UI for Migration Wizard
+Description:
+- Add admin UI flow (pages/modals) to drive upload → mapping → validation → commit using the migration APIs; show progress and errors.
+Expected Output:
+- Usable wizard in admin area with clear steps and statuses.
+Testing Instructions:
+- Run through wizard with sample file; verify each step’s UI and backend responses; ensure errors surface cleanly.
+Dependencies:
+- Steps X.2–X.8 backend, Step 4.8/4.9 admin UI base, Step 5 hooks.
+
+Step X.11 — Update Build Log & Cleanup
+Description:
+- Document migration engine progress/completion in `buildlog.md`; remove temporary scripts/logs.
+Expected Output:
+- Build log updated; clean codebase.
+Testing Instructions:
+- `npm run lint`/`npm run build`; verify buildlog entry.
+Dependencies:
+- Steps X.1–X.10.

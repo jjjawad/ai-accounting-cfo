@@ -1,0 +1,99 @@
+Step 14.1 — Define VAT Codes, Rates, and Rules
+Description:
+- Consolidate UAE VAT codes (standard 5%, zero, exempt, out_of_scope, reverse_charge) with applicability rules and default mappings to categories/vendors. Store in config or seed references.
+Expected Output:
+- VAT config module with code enums, rates, and default behaviors; aligned with seeds from Step 8.13.
+Testing Instructions:
+- `npm run lint`; verify config exports correct rates via temporary log (remove after).
+Dependencies:
+- Step 8.9 (vat_codes), Step 8.13 seeds.
+
+Step 14.2 — VAT Classification Helper
+Description:
+- Implement helper to determine VAT code for a transaction/invoice using category, vendor defaults, and document extraction fields. Include override precedence and fallback to standard/out_of_scope.
+Expected Output:
+- Function returning vat_code_id and rationale; gracefully handles missing data.
+Testing Instructions:
+- Run helper on sample transactions with varying categories/vendors; verify expected code selection.
+Dependencies:
+- Step 14.1, Step 8.6 (transactions), Step 8.7 (invoices), Step 8.4 (vendors), Step 12 (categorization).
+
+Step 14.3 — Apply VAT Codes During Categorization/Extraction
+Description:
+- Integrate VAT helper into categorization pipeline and document extraction insertion so VAT codes are assigned when available; store on transactions and invoices.
+Expected Output:
+- Transactions/invoices populated with vat_code_id; status reflects VAT assignment completion.
+Testing Instructions:
+- Re-run categorization on sample data; check DB rows for vat_code_id; ensure no missing values where determinable.
+Dependencies:
+- Steps 12.4, 10.5, 14.2.
+
+Step 14.4 — Compute VAT Summary per Period
+Description:
+- Implement backend service to aggregate input/output VAT for a given period (dates or current VAT period), grouping by vat_code. Use transactions/invoices data.
+Expected Output:
+- Function returning totals and breakdown matching Master Doc VAT summary shape.
+Testing Instructions:
+- Run service against sample dataset; validate numbers manually; ensure grouping by vat_code works.
+Dependencies:
+- Steps 14.2–14.3, Step 8.9 (vat_returns structure).
+
+Step 14.5 — VAT Summary API Endpoint
+Description:
+- Update `/api/vat/summary` to accept period params, call aggregation, and return breakdown/net VAT. Include validation and auth.
+Expected Output:
+- Endpoint returns accurate VAT summary JSON for requested period; errors for invalid dates.
+Testing Instructions:
+- `curl /api/vat/summary?period_start=...&period_end=...` with auth; verify numbers match manual calc; invalid range returns 400.
+Dependencies:
+- Step 14.4, Step 7.4 (responses), Step 7.3 (auth).
+
+Step 14.6 — Persist/Update VatReturn Records
+Description:
+- When summary requested, create/update `vat_returns` table for the period, storing totals and status `draft`. Allow finalize flag to set status `finalized`.
+Expected Output:
+- `vat_returns` rows created/updated per period with totals; finalized status honored.
+Testing Instructions:
+- Call summary with finalize flag; verify DB row exists and status set; repeat call updates same row.
+Dependencies:
+- Step 14.5, Step 8.9 (vat_returns).
+
+Step 14.7 — Frontend VAT Screen Wiring
+Description:
+- Connect VAT page to `/api/vat/summary`, showing totals, breakdown, and handling loading/error. Add finalize trigger (stub) to set status.
+Expected Output:
+- UI displays live VAT data; finalize button triggers API and updates status badge.
+Testing Instructions:
+- Load VAT page; verify data matches backend; click finalize (if enabled) and confirm status change; errors show toast.
+Dependencies:
+- Step 14.5, Step 5 hooks, Step 4.4 UI.
+
+Step 14.8 — Export VAT Filing Pack Placeholder
+Description:
+- Add endpoint/button to export VAT pack (PDF/CSV placeholder) for selected period; return generated file or stub download.
+Expected Output:
+- Download link/button works and returns placeholder pack; proper filename with period.
+Testing Instructions:
+- Click export on VAT page; confirm file downloads; inspect contents stub.
+Dependencies:
+- Step 14.4 data, Step 14.5 endpoint (extend), Step 7.2 storage helper for temp files (optional).
+
+Step 14.9 — Log VAT Calculations & Errors
+Description:
+- Record system_logs entries for VAT runs/failures; include period and counts to aid auditing.
+Expected Output:
+- Logs created for each summary/finalize action with company_id and period.
+Testing Instructions:
+- Generate VAT summary; check logs table for entry; force invalid input to see error log.
+Dependencies:
+- Steps 14.4–14.6, Step 8.11.
+
+Step 14.10 — Update Build Log & Cleanup
+Description:
+- Document Step 14 completion in `buildlog.md`; remove temporary debug/testing code.
+Expected Output:
+- Build log updated; clean codebase.
+Testing Instructions:
+- `npm run lint`/`npm run build`; verify buildlog entry.
+Dependencies:
+- Steps 14.1–14.9.

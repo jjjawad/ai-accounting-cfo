@@ -5,13 +5,12 @@ import SummaryCard from "@/components/dashboard/summary-card";
 import ChartPlaceholder from "@/components/dashboard/chart-placeholder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockOverviewMetrics } from "@/lib/mocks";
 import { useMockOverview } from "@/hooks/use-mock-overview";
 import { useMockTransactions } from "@/hooks/use-mock-transactions";
-
-console.log("[Step 6.1] mockOverviewMetrics", mockOverviewMetrics);
+import { useDashboardOverview } from "@/hooks/queries/use-dashboard-overview";
 
 export default function Page() {
+  useDashboardOverview();
   const { data: overview } = useMockOverview();
   const { data: transactions } = useMockTransactions();
   const recent = [...transactions]

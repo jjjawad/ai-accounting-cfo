@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { MockVatBreakdownItem } from "@/lib/mocks";
 
-export default function VatBreakdownTable() {
+export default function VatBreakdownTable({ breakdown }: { breakdown: MockVatBreakdownItem[] }) {
   return (
     <Card>
       <CardHeader>
@@ -18,27 +19,23 @@ export default function VatBreakdownTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell>STANDARD_5</TableCell>
-              <TableCell>Standard Rated (5%)</TableCell>
-              <TableCell>AED —</TableCell>
-              <TableCell>AED —</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>ZERO</TableCell>
-              <TableCell>Zero Rated</TableCell>
-              <TableCell>AED —</TableCell>
-              <TableCell>AED —</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>EXEMPT</TableCell>
-              <TableCell>Exempt</TableCell>
-              <TableCell>AED —</TableCell>
-              <TableCell>AED —</TableCell>
-            </TableRow>
+            {breakdown.map((item) => (
+              <TableRow key={item.vat_code}>
+                <TableCell>{item.vat_code}</TableCell>
+                <TableCell>{vatDescriptions[item.vat_code] ?? "—"}</TableCell>
+                <TableCell>AED {item.output_vat.toLocaleString()}</TableCell>
+                <TableCell>AED {item.input_vat.toLocaleString()}</TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
   );
 }
+
+const vatDescriptions: Record<string, string> = {
+  STANDARD_5: "Standard Rated (5%)",
+  ZERO: "Zero Rated",
+  EXEMPT: "Exempt",
+};

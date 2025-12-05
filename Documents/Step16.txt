@@ -1,0 +1,99 @@
+Step 16.1 — Define Dashboard Metrics Contract
+Description:
+- Specify exact fields for overview API (cash_balance, income/expenses this month, net result, VAT due, runway, insights) aligning with Master Doc and frontend expectations.
+Expected Output:
+- Contract documented (types/interface) in shared types folder; used by backend and frontend.
+Testing Instructions:
+- `npm run lint` to ensure types compile; confirm imports resolve.
+Dependencies:
+- Steps 5 (state hooks), 7 (backend scaffold), 8 (schema).
+
+Step 16.2 — Implement Aggregations for Income/Expenses & Net Result
+Description:
+- Build backend service to compute current period income, expenses, and net result from transactions (categorized). Handle currency consistency.
+Expected Output:
+- Function returns numeric metrics for period; handles empty data gracefully.
+Testing Instructions:
+- Run service on sample DB; validate sums manually.
+Dependencies:
+- Step 8.6 (transactions), Step 12 (categories), Step 14 (VAT not required for sums).
+
+Step 16.3 — Compute Cash Balance & Runway Fields
+Description:
+- Add calculation for current cash balance (sum of balances or latest per account) and reuse forecast/burn rate to compute runway_days.
+Expected Output:
+- Service returns cash_balance and runway_days; handles missing forecast by deriving simple estimate.
+Testing Instructions:
+- Test with sample balances; verify runway calculation matches burn rate inputs.
+Dependencies:
+- Step 15 (forecast/burn rate), Step 8.4 (bank_accounts), Step 8.6.
+
+Step 16.4 — VAT Due Metric Integration
+Description:
+- Pull VAT due from latest vat_return for current period or recompute summary if missing; include in overview result.
+Expected Output:
+- VAT due numeric value in overview; consistent with Step 14 calculations.
+Testing Instructions:
+- With VAT data present, verify overview VAT matches VAT summary; without, ensure fallback recompute works.
+Dependencies:
+- Step 14 (VAT summary/returns).
+
+Step 16.5 — Generate Insights Placeholders
+Description:
+- Create simple heuristic insights (e.g., percentage change vs last month) using aggregated data; placeholder text until AI summaries added later.
+Expected Output:
+- Array of 2–3 insight strings included in overview response; empty if insufficient data.
+Testing Instructions:
+- Run overview service on sample data; verify insight strings; ensure no errors when data sparse.
+Dependencies:
+- Steps 16.2–16.4.
+
+Step 16.6 — Dashboard Overview API Endpoint
+Description:
+- Update `/api/dashboard/overview` to call aggregation services and return full overview payload with caching (short TTL) to reduce cost.
+Expected Output:
+- Endpoint returns live metrics; optional cache layer (in-memory) with configurable TTL.
+Testing Instructions:
+- `curl /api/dashboard/overview` with auth; verify fields and cache behavior (second call faster or from cache).
+Dependencies:
+- Steps 16.2–16.5, Step 7.3 (auth), Step 7.4 (responses).
+
+Step 16.7 — Dashboard Charts Data Endpoint
+Description:
+- Add `/api/dashboard/charts` (or extend overview) returning income vs expense series, category breakdown, and cashflow mini-series.
+Expected Output:
+- Endpoint returns chart-ready arrays matching frontend expectations; handles empty data.
+Testing Instructions:
+- `curl` endpoint; verify arrays format and values; ensure no errors on empty DB.
+Dependencies:
+- Step 16.2 (series), Step 15 (cashflow mini-series optional).
+
+Step 16.8 — Frontend Wiring to Live Dashboard Data
+Description:
+- Replace mock hooks on Dashboard page with real API hooks (fallback to mock if empty/dev). Handle loading/error states.
+Expected Output:
+- Dashboard displays live metrics/charts when data exists; mock used only when no data.
+Testing Instructions:
+- Load dashboard after sample data exists; verify numbers match backend; simulate error to see UI handling.
+Dependencies:
+- Steps 16.6–16.7, Step 5 hooks, Step 6 mocks for fallback.
+
+Step 16.9 — Logging & Performance Check
+Description:
+- Add lightweight timing/logging for dashboard aggregation; ensure queries are indexed and performant; adjust indexes if needed.
+Expected Output:
+- Logs show durations; queries use indexes; no slow responses under normal data size.
+Testing Instructions:
+- Enable logging; hit overview endpoint; inspect timings; verify indexes in DB.
+Dependencies:
+- Steps 16.2–16.7, Step 8.12 indexes.
+
+Step 16.10 — Update Build Log & Cleanup
+Description:
+- Record Step 16 in `buildlog.md`; remove temporary debug statements.
+Expected Output:
+- Build log updated; code clean.
+Testing Instructions:
+- `npm run lint`/`npm run build`; ensure buildlog entry present.
+Dependencies:
+- Steps 16.1–16.9.

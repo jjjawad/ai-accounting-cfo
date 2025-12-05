@@ -1,0 +1,153 @@
+Step 8.1 — Prepare Schema Workspace & Conventions
+Description:
+- Create a dedicated schema folder (e.g., `supabase/migrations/step8/`) or SQL file(s) to hold Step 8 DDL. Document naming conventions for tables, PKs (UUID), timestamps, and `company_id` scoping as per the Master Document.
+Expected Output:
+- Schema files ready to receive DDL; conventions noted (UUID PKs, `created_at/updated_at`, `company_id` on tenant tables).
+- No schema changes applied yet.
+Testing Instructions:
+- Verify the folder/files exist and are referenced in your migration workflow (Supabase CLI or dashboard).
+Dependencies:
+- Step 2.5 (types folder), Step 7 scaffolding.
+
+Step 8.2 — Create Core Identity Tables (users, companies, user_companies)
+Description:
+- Add DDL for `users`, `companies`, and `user_companies` (membership/roles) matching Master Doc fields: role enum (owner/member/admin), fiscal year start, VAT flags, timestamps.
+Expected Output:
+- Tables created with FK relationships (`user_companies.user_id -> users.id`, `company_id -> companies.id`), indexes on foreign keys, and role check/enum.
+Testing Instructions:
+- Apply migration; in Supabase dashboard, confirm tables/columns and FK constraints exist.
+- Insert a sample user/company/membership via SQL and ensure FK constraints enforce integrity.
+Dependencies:
+- Step 8.1.
+
+Step 8.3 — Create Chart of Accounts & Categories Tables
+Description:
+- Add `categories` (or `chart_of_accounts`) to store default and custom categories, with fields for type (income/expense/asset/liability/equity), VAT defaults, and `company_id` for overrides.
+Expected Output:
+- Category table with PK, company-scoped (nullable or default templates), indexes on `company_id` and `type`.
+Testing Instructions:
+- Apply migration; insert a default category and a company-specific override; ensure uniqueness rules behave as intended.
+Dependencies:
+- Step 8.2.
+
+Step 8.4 — Create Bank Accounts & Vendors Tables
+Description:
+- Add `bank_accounts` and `vendors` tables per Master Doc: IBAN optional, currency, default category/VAT for vendors, all scoped by `company_id`.
+Expected Output:
+- Tables with PKs, FKs to `companies`, and useful indexes on `company_id` and vendor name for lookup.
+Testing Instructions:
+- Apply migration; insert bank account and vendor rows tied to a company; verify FK enforcement.
+Dependencies:
+- Step 8.2.
+
+Step 8.5 — Create Files/Documents Table
+Description:
+- Add `files` table storing uploads (bank statements, invoices, receipts, PDCs): storage_path, type enum, status, company_id, optional references (transaction_id, invoice_id), timestamps.
+Expected Output:
+- Table with PK, `company_id` FK, enums for type/status, indexes on `company_id` and `type`.
+Testing Instructions:
+- Apply migration; insert a sample file row; ensure enum/status constraints work.
+Dependencies:
+- Step 8.2 (company), Step 8.4 (vendors optional), Step 8.3 (categories optional).
+
+Step 8.6 — Create Transactions Table
+Description:
+- Add `bank_transactions` with fields from Master Doc: bank_account_id, date, description_raw, amount (signed), currency, balance_after, status (raw/categorized/reconciled), category_id, vendor_id, vat_code_id, confidence_score, source_file_id.
+Expected Output:
+- Table with PK, FKs to company, bank_accounts, categories, vendors, vat_codes (later), files; indexes on `company_id`, `date`, `status`, `category_id`, `vendor_id`.
+Testing Instructions:
+- Apply migration; insert a transaction linked to a bank account and file; verify FKs and status enum.
+Dependencies:
+- Step 8.4 (bank_accounts/vendors), Step 8.3 (categories), Step 8.5 (files).
+
+Step 8.7 — Create Invoices & Line Items Tables
+Description:
+- Add `invoices` (or documents->invoices) and `invoice_line_items` per Master Doc: vendor_id, file_id, totals, vat_amount, currency, status, and line item details (description, qty, unit_price, vat_code_id).
+Expected Output:
+- Tables with PKs, FKs to company, vendors, files, vat_codes; cascading delete rules as appropriate; indexes on `company_id`, `vendor_id`, `status`.
+Testing Instructions:
+- Apply migration; insert an invoice + line items; ensure totals and FKs are valid.
+Dependencies:
+- Step 8.5 (files), Step 8.4 (vendors), Step 8.3 (categories optional), Step 8.6 (transactions reference later).
+
+Step 8.8 — Create PDC Items Table
+Description:
+- Add `pdc_items` capturing issued/received cheques: company_id, bank_account_id, due_date, amount, currency, payer/payee, cheque_number, status (scheduled/cleared), optional linked transaction_id/file_id.
+Expected Output:
+- Table with PK, FKs to company, bank_accounts, files, transactions; indexes on `company_id`, `due_date`, `status`.
+Testing Instructions:
+- Apply migration; insert scheduled and cleared PDCs; ensure status enum accepted and FKs hold.
+Dependencies:
+- Step 8.6 (transactions), Step 8.4 (bank_accounts), Step 8.5 (files).
+
+Step 8.9 — Create VAT Codes & VAT Returns Tables
+Description:
+- Add `vat_codes` (with rate, label, type: standard/zero/exempt/out_of_scope/reverse_charge) and `vat_returns` per Master Doc, storing period, totals, net_vat_due, status (draft/finalized).
+Expected Output:
+- Tables with PKs, FKs to company, indexes on `company_id` and code; vat_returns keyed by period dates.
+Testing Instructions:
+- Apply migration; insert vat_codes seeds (can be empty here) and a vat_return row; verify constraints.
+Dependencies:
+- Step 8.2 (company), Step 8.3 (categories may reference later).
+
+Step 8.10 — Create Journal Entries & Journal Lines Tables
+Description:
+- Add `journal_entries` (id, company_id, date, description, source_type/id) and `journal_lines` (account_code, debit, credit, vat_code_id). Ensure double-entry capability.
+Expected Output:
+- Tables with PKs, FK to company, journal_lines FK to journal_entries, indexes on `company_id`, `date`.
+Testing Instructions:
+- Apply migration; insert a balanced journal entry with two lines; verify constraints and totals possible via query.
+Dependencies:
+- Step 8.3 (accounts/categories), Step 8.9 (vat_codes).
+
+Step 8.11 — Create Chat Messages & System Logs Tables
+Description:
+- Add `chat_messages` (company_id, user_id nullable, role enum, content, metadata JSON) and `system_logs` (company_id nullable, level enum, source, message, context JSON) per Master Doc.
+Expected Output:
+- Tables with PKs, indexes on `company_id`, `created_at`, `level`/`source` for logs.
+Testing Instructions:
+- Apply migration; insert sample chat messages and logs; confirm enums and JSON columns accept data.
+Dependencies:
+- Step 8.2 (users/companies).
+
+Step 8.12 — Add Supporting Indexes & Constraints
+Description:
+- Add performance/uniqueness indexes: e.g., `transactions (company_id, date)`, `vendors (company_id, name)`, `files (company_id, type)`, `pdc_items (company_id, due_date)`, `vat_returns (company_id, period_start, period_end)` unique. Enforce non-zero amount on transactions and invoices, date validation check constraints where supported.
+Expected Output:
+- Index statements and check constraints committed to migration files.
+Testing Instructions:
+- Apply migration; verify indexes in Supabase dashboard; attempt invalid inserts (amount = 0) to ensure constraints block them.
+Dependencies:
+- Steps 8.2–8.11.
+
+Step 8.13 — Seed Default Categories & VAT Codes
+Description:
+- Add seed SQL for default SME chart of accounts/categories and UAE VAT codes (standard 5%, zero, exempt, out_of_scope, reverse_charge) as per Master Doc. Keep seeds idempotent (upserts).
+Expected Output:
+- Seed script populates categories/vat_codes for company-agnostic templates (or a special template company_id null).
+Testing Instructions:
+- Apply seed; query categories and vat_codes to confirm records and rates; rerun seed to ensure no duplicates.
+Dependencies:
+- Steps 8.3 and 8.9 tables exist.
+
+Step 8.14 — Implement RLS Policies for Multi-Tenancy
+Description:
+- Add row-level security policies scoping data by `company_id` for all tenant tables (transactions, files, invoices, PDCs, journals, chat, logs). Ensure admin bypass pattern is noted for internal operator per Master Doc.
+Expected Output:
+- RLS enabled on relevant tables with policies enforcing `company_id = auth.company_id` (or equivalent) and admin bypass placeholders.
+Testing Instructions:
+- In Supabase SQL editor, test select as a role with a specific company_id; confirm cross-company data is blocked. Test admin role to ensure access.
+Dependencies:
+- Steps 8.2–8.11 (tables exist), Step 1.7 (Supabase auth set up).
+
+Step 8.15 — Sanity Validation & Schema Docs
+Description:
+- Run a full migration apply in local/remote Supabase; document final table list and relationships in `supabase/README.md` or similar, noting deviations from Master Doc if any.
+Expected Output:
+- Successful migration run; updated schema README summarizing tables and key enums/checks/RLS.
+- No pending/failed migrations.
+Testing Instructions:
+- `supabase db push` (or equivalent) succeeds; Supabase dashboard shows tables; quick sample queries for key tables succeed.
+- Ensure `npm run lint` (backend) still passes after any type updates referencing new tables/types (if added).
+Dependencies:
+- Steps 8.1–8.14 complete.
