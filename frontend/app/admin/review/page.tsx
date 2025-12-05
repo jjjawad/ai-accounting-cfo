@@ -1,3 +1,5 @@
+"use client";
+
 import { ProtectedRoute } from "@/components/protected-route";
 import ReviewTabs from "@/components/admin/review/review-tabs";
 import { useAdmin } from "@/hooks/queries/use-admin";
