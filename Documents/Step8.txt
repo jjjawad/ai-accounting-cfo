@@ -1,0 +1,343 @@
+Step 8.1 — Create Core Identity & Multi-Tenancy Tables (`users`, `companies`, `memberships`)
+Description:
+
+* Create the foundational tables for application users, companies, and memberships/roles, aligned with the Master Document models `User`, `Company`, and `UserCompany`. 
+* Ensure `memberships` links a user to a company with a role (owner/member/admin) to support multi-tenancy. 
+
+Expected Output:
+
+* Tables created: `users`, `companies`, `memberships` (or `user_companies`).
+* `memberships.user_id` FK → `users.id`; `memberships.company_id` FK → `companies.id`.
+* Basic constraints: non-null emails, company name, valid role enum.
+
+Testing Instructions:
+
+* In Supabase Table Editor or SQL console, confirm all three tables exist with correct columns.
+* Insert a sample user, company, and membership row; query a join to verify relationships.
+
+Dependencies:
+
+* Step 1 (Supabase project + env).
+* Step 2 (types and folder structure for shared interfaces).
+
+---
+
+Step 8.2 — Implement Bank Accounts & Transactions Tables (`bank_accounts`, `bank_transactions`)
+Description:
+
+* Create banking-related tables following `BankAccount` and `BankTransaction` structures, including fields for dates, amounts, status, and company/bank account relationships. 
+
+Expected Output:
+
+* Tables: `bank_accounts`, `bank_transactions`.
+* FKs: `bank_accounts.company_id` → `companies.id`; `bank_transactions.company_id` → `companies.id`; `bank_transactions.bank_account_id` → `bank_accounts.id`.
+* Enum/text for `status` (`raw`, `categorized`, `reconciled`).
+* Numeric columns for `amount`, `balance_after`.
+
+Testing Instructions:
+
+* Insert a bank account for a test company, then insert a few bank transactions referencing it.
+* Run a query filtered by `company_id` and `bank_account_id` to verify joins and data types.
+
+Dependencies:
+
+* Step 8.1 (companies).
+
+---
+
+Step 8.3 — Implement File/Documents Table (`files` / `documents`)
+Description:
+
+* Create table to store uploaded file metadata as per `File` model (storage path, type, mime type, size, OCR text, status). 
+
+Expected Output:
+
+* Table: `files` (or `documents`, but consistent across backend & frontend).
+* Columns for `company_id`, `storage_path`, `type`, `original_name`, `mime_type`, `size_bytes`, `ocr_text`, `status`, `error_message`, timestamps.
+* FK: `company_id` → `companies.id`.
+
+Testing Instructions:
+
+* Insert a mock file row with `status='uploaded'` and dummy `storage_path`.
+* Query by `company_id` and `type` to confirm schema and indexing basics.
+
+Dependencies:
+
+* Step 8.1 (companies).
+
+---
+
+Step 8.4 — Implement Vendor, Category & VAT Code Tables (`vendors`, `categories`, `vat_codes`)
+Description:
+
+* Create tables for vendors, chart of accounts categories, and VAT codes according to `Vendor`, `Category`, and `VatCode` models. 
+
+Expected Output:
+
+* Tables: `vendors`, `categories`, `vat_codes`.
+* FKs:
+
+  * `vendors.company_id` → `companies.id`.
+  * `vendors.default_category_id` → `categories.id` (nullable).
+  * `vendors.default_vat_code_id` → `vat_codes.id` (nullable).
+  * `categories.company_id` nullable to allow global defaults.
+  * `vat_codes.company_id` nullable to allow global defaults.
+* `categories.type` constrained to allowed values (`income`, `expense`, `asset`, `liability`, `equity`).
+
+Testing Instructions:
+
+* Insert a few global `categories` and `vat_codes`, then a vendor referencing them.
+* Query joins to verify default mappings resolve correctly.
+
+Dependencies:
+
+* Step 8.1 (companies).
+
+---
+
+Step 8.5 — Implement Invoice & Line Item Tables (`invoices`, `invoice_line_items`)
+Description:
+
+* Create invoice tables according to `Invoice` and `InvoiceLineItem` models, capturing vendor, file link, totals, VAT, and payment status. 
+
+Expected Output:
+
+* Tables: `invoices`, `invoice_line_items`.
+* FKs:
+
+  * `invoices.company_id` → `companies.id`.
+  * `invoices.vendor_id` → `vendors.id` (nullable).
+  * `invoices.file_id` → `files.id` (nullable).
+  * `invoices.vat_code_id` → `vat_codes.id` (nullable).
+  * `invoice_line_items.invoice_id` → `invoices.id`.
+  * `invoice_line_items.category_id` → `categories.id` (nullable).
+* Enums/text for `type` (`supplier` / `customer`) and `status` (`unpaid`, `part_paid`, `paid`).
+
+Testing Instructions:
+
+* Insert a supplier invoice linked to a vendor and file; add 1–2 line items.
+* Query aggregated sum of line items vs `invoice.total_amount` to verify consistency.
+
+Dependencies:
+
+* Step 8.2 (bank tables not required but useful later).
+* Step 8.3 (files).
+* Step 8.4 (vendors, categories, VAT codes).
+
+---
+
+Step 8.6 — Implement PDC Table (`pdc_items`)
+Description:
+
+* Create PDC (post-dated cheques) table based on `PDCItem`, tracking issue dates, due dates, amounts, type (issued/received), and link to bank transactions. 
+
+Expected Output:
+
+* Table: `pdc_items`.
+* FKs:
+
+  * `company_id` → `companies.id`.
+  * `bank_account_id` → `bank_accounts.id` (nullable).
+  * `linked_transaction_id` → `bank_transactions.id` (nullable).
+* Enum/text columns for `type` (`issued`/`received`) and `status` (`scheduled`, `cleared`, `bounced`, `cancelled`).
+
+Testing Instructions:
+
+* Insert a scheduled PDC for a test company and bank account.
+* Query by upcoming `due_date` range; ensure `status` and `type` are stored correctly.
+
+Dependencies:
+
+* Step 8.2 (bank accounts & transactions).
+
+---
+
+Step 8.7 — Implement Journal Backbone (`journal_entries`, `journal_lines`)
+Description:
+
+* Create journal tables implementing the double-entry backbone using `JournalEntry` and `JournalLine` models, including source references to bank transactions, invoices, PDCs, and manual entries. 
+
+Expected Output:
+
+* Tables: `journal_entries`, `journal_lines`.
+* FKs:
+
+  * `journal_entries.company_id` → `companies.id`.
+  * `journal_lines.journal_entry_id` → `journal_entries.id`.
+  * Optional `journal_lines.vat_code_id` → `vat_codes.id`.
+* Columns on `journal_lines` for `account_code`, `debit`, `credit`.
+* `source_type` and `source_id` on `journal_entries` for traceability.
+
+Testing Instructions:
+
+* Insert a sample journal entry with two lines (one debit, one credit) ensuring debits = credits.
+* Query grouped by `journal_entry_id` to confirm balance.
+
+Dependencies:
+
+* Step 8.1 (companies).
+* Step 8.4 (VAT codes, categories/gl accounts).
+
+---
+
+Step 8.8 — Implement VAT Return Table (`vat_returns`)
+Description:
+
+* Create VAT period summary table in line with `VatReturn` model to store period start/end and total input/output/net VAT plus status. 
+
+Expected Output:
+
+* Table: `vat_returns`.
+* FK: `company_id` → `companies.id`.
+* Columns for `period_start`, `period_end`, `total_output_vat`, `total_input_vat`, `net_vat_due`, `status` (`draft`/`finalized`).
+
+Testing Instructions:
+
+* Insert a draft VAT return row for a test period.
+* Query by `company_id` and date range to confirm retrieval and types.
+
+Dependencies:
+
+* Step 8.1 (companies).
+
+---
+
+Step 8.9 — Implement Cashflow Snapshot Table (`cashflow_snapshots`)
+Description:
+
+* Create table according to `CashflowSnapshot` to store periodic forecast snapshots and derived burn/runway metrics. 
+
+Expected Output:
+
+* Table: `cashflow_snapshots`.
+* FK: `company_id` → `companies.id`.
+* Columns for `as_of_date`, `projected_days`, `series` (JSON), `burn_rate_monthly`, `runway_days`, `assumptions` (JSON).
+
+Testing Instructions:
+
+* Insert a dummy snapshot JSON series for a test company.
+* Query by `company_id` and latest `as_of_date` to ensure JSON fields are stored and retrievable.
+
+Dependencies:
+
+* Step 8.1 (companies).
+
+---
+
+Step 8.10 — Implement Chat & Logging Tables (`chat_messages`, `system_logs`)
+Description:
+
+* Create tables for chat history and system logging following `ChatMessage` and `SystemLog` models to support AI CFO conversations and operational audit trails. 
+
+Expected Output:
+
+* Tables: `chat_messages`, `system_logs`.
+* FKs:
+
+  * `chat_messages.company_id` → `companies.id`.
+  * `chat_messages.user_id` → `users.id` (nullable for AI messages).
+  * `system_logs.company_id` → `companies.id` (nullable for global logs).
+* Enum/text columns:
+
+  * `chat_messages.role` (`user`, `assistant`, `system`).
+  * `system_logs.level` (`info`, `warn`, `error`).
+
+Testing Instructions:
+
+* Insert a mock user message + assistant reply into `chat_messages`; query ordered by `created_at`.
+* Insert a system log entry with JSON `context`; query logs filtered by `source` and `level`.
+
+Dependencies:
+
+* Step 8.1 (users, companies).
+
+---
+
+Step 8.11 — Add Foreign Keys, Relationships & Indexes
+Description:
+
+* Add all FK constraints and indexes across the schema to support fast queries and referential integrity: `company_id` indexes, date indexes, and relationship constraints across transactions, invoices, journals, PDCs, and VAT. 
+
+Expected Output:
+
+* All FKs enforced (no orphaned records allowed).
+* Indexes on common query fields: `company_id`, `date`/`as_of_date`, `status`, `vendor_id`, `category_id`, `vat_code_id`, `due_date`.
+* Unique constraints where appropriate (e.g., `memberships` unique on `(user_id, company_id)`).
+
+Testing Instructions:
+
+* Attempt to insert a child row with invalid FK and confirm it fails.
+* Explain query plans or check performance on simple filters (e.g., `EXPLAIN` on a transaction query by `company_id` + date).
+
+Dependencies:
+
+* Step 8.2–8.10 (all tables defined).
+
+---
+
+Step 8.12 — Implement RLS Policies for Company Isolation
+Description:
+
+* Implement Supabase Row Level Security policies to ensure all company-scoped tables only return rows belonging to the authenticated user’s companies, according to membership/role. 
+
+Expected Output:
+
+* RLS enabled on: `companies`, `memberships`, `bank_accounts`, `bank_transactions`, `files`, `vendors`, `categories` (where company-specific), `vat_codes` (where company-specific), `invoices`, `invoice_line_items`, `pdc_items`, `journal_entries`, `journal_lines`, `vat_returns`, `cashflow_snapshots`, `chat_messages`, `system_logs` (if appropriate).
+* Policies that:
+
+  * Allow a user to see rows where they have a membership for that `company_id`.
+  * Allow internal admin role (as per future Step 18) broader access.
+
+Testing Instructions:
+
+* Using Supabase’s “Run as user” feature or two test users, verify that:
+
+  * User A cannot read User B’s company data.
+  * A member with no membership to a company sees zero rows from that company.
+
+Dependencies:
+
+* Step 8.1 (memberships table).
+* Step 7 (backend Supabase server client patterns, for consistency with how queries expect RLS).
+
+---
+
+Step 8.13 — Seed Default Chart of Accounts Categories
+Description:
+
+* Seed a reasonable default SME chart of accounts into `categories` for UAE-focused SMEs, with global (`company_id` null) rows and appropriate `type` and `gl_account_code` values. 
+
+Expected Output:
+
+* Seed script/migration inserting default income, expense, asset, liability, and equity categories (e.g., “Sales”, “Marketing”, “Rent”, “Bank Charges”).
+* `company_id` set to null for global defaults; ready to be copied/extended per company later.
+
+Testing Instructions:
+
+* Query `categories` where `company_id IS NULL` and confirm a complete baseline chart exists.
+* Create a new company and verify that these global categories are accessible for mapping in the UI/logic.
+
+Dependencies:
+
+* Step 8.4 (categories table).
+
+---
+
+Step 8.14 — Seed Default VAT Codes for UAE
+Description:
+
+* Seed default UAE VAT codes (standard-rated 5%, zero-rated, exempt, out-of-scope, reverse charge) into `vat_codes`, matching the VAT logic section of the Master Document. 
+
+Expected Output:
+
+* Rows in `vat_codes` for codes such as `STANDARD_5`, `ZERO`, `EXEMPT`, `OUT_OF_SCOPE`, `RCM` with correct `rate`, `description`, and `recoverable` flags.
+* `company_id` null for global defaults (can be overridden per company later).
+
+Testing Instructions:
+
+* Query all `vat_codes` and verify that required codes exist with correct rates and descriptions.
+* Test referencing one of these codes from an invoice or transaction row to ensure FK integrity.
+
+Dependencies:
+
+* Step 8.4 (vat_codes table).

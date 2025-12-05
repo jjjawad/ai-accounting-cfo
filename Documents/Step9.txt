@@ -1,0 +1,235 @@
+Step 9.1 — Define File Upload Types & Validation
+Description:
+
+* Create or refine shared TypeScript interfaces and Zod schemas for file uploads and the `File` entity, aligning with the `File` model in the Master Document (fields like `company_id`, `storage_path`, `type`, `status`). 
+  Expected Output:
+* A `types/file.ts` (or equivalent) exporting a `File` interface.
+* A validation schema for the upload request (multipart fields: `file`, `company_id`, optional `type`).
+  Testing Instructions:
+* Run TypeScript build to ensure no type errors.
+* Write a small unit test (or temporary script) to validate sample payloads against the schema (valid passes, invalid fails).
+  Dependencies:
+* Step 2 (Types folder created). 
+* Step 8 (DB schema for `File` implemented). 
+
+---
+
+Step 9.2 — Implement Supabase Storage Helper for File Uploads
+Description:
+
+* Add a helper function in `/lib/supabase/storage` that uploads a file (buffer/stream) to a Supabase Storage bucket, returns the `storage_path`, and handles basic error mapping. This encapsulates bucket name and path conventions (e.g., `company_id/type/fileId-originalName`). 
+  Expected Output:
+* A reusable `uploadFileToStorage` helper that accepts `{ companyId, file, type }` and returns `{ storagePath }` or throws a controlled error.
+  Testing Instructions:
+* Temporarily call this helper from a script or simple test route with a small test file.
+* Verify in Supabase Storage UI that the file is uploaded under the expected path.
+  Dependencies:
+* Step 7 (Supabase server client helpers). 
+* Step 8 (Supabase Storage bucket created/configured). 
+
+---
+
+Step 9.3 — Implement `/api/files/upload` Endpoint: Request Parsing & Auth
+Description:
+
+* Implement the API route handler for `POST /api/files/upload` (or fill in the existing scaffold) to parse multipart form-data, extract `file`, `company_id`, and optional `type`, and enforce that the authenticated user belongs to the given company (RLS + membership check).
+  Expected Output:
+* Endpoint correctly rejects unauthenticated requests (401) and invalid/missing form fields (400).
+* Valid requests progress past validation and membership checks.
+  Testing Instructions:
+* Use Thunder Client/Postman to send:
+
+  * No auth → expect 401.
+  * Auth but missing `company_id` → expect 400.
+  * Auth but with company the user does not belong to → expect 403.
+    Dependencies:
+* Step 3 (Auth-protected routes shell). 
+* Step 5 (React Query + session handling; underlying auth already setup). 
+* Step 7 (Authentication middleware + API scaffolding). 
+
+---
+
+Step 9.4 — Implement `/api/files/upload` Endpoint: Store File in Supabase Storage
+Description:
+
+* Inside the upload handler, stream the uploaded file into the Supabase Storage bucket using the storage helper, generating a canonical `storage_path` for the file. 
+  Expected Output:
+* Successful uploads result in a stored file in Supabase at the expected path.
+* On any storage error, the endpoint returns a clear 500 with `{ error: "…" }`. 
+  Testing Instructions:
+* Upload a small test PDF/image via Thunder Client/Postman.
+* Confirm a 200/201 response and that the file appears in Supabase Storage.
+  Dependencies:
+* Step 9.2 (Storage helper implemented).
+
+---
+
+Step 9.5 — Implement `/api/files/upload` Endpoint: Create File Record in DB
+Description:
+
+* After a successful storage upload, insert a `File` record into the DB with fields populated from the request and storage result (`company_id`, `storage_path`, `type`, `original_name`, `mime_type`, `size_bytes`, `status='uploaded'`).
+  Expected Output:
+* New row in `files` (or equivalent table) with correct data and `status='uploaded'`.
+* Endpoint response JSON matches Master Document contract: `{ "file_id": "string", "status": "uploaded" }`. 
+  Testing Instructions:
+* Call the endpoint with a test file.
+* Verify response includes `file_id`.
+* Check Supabase DB table to confirm the record exists and is correctly linked to storage path and company.
+  Dependencies:
+* Step 9.1 (File type/schema).
+* Step 9.4 (Storage path available).
+
+---
+
+Step 9.6 — Implement `/api/files/:id/process` Endpoint Skeleton & Validation
+Description:
+
+* Implement the API route handler for `POST /api/files/:id/process` to:
+
+  * Validate `id` param.
+  * Load the `File` record for the current company (RLS-safe).
+  * Reject if the file does not belong to the requesting company or does not exist.
+    Expected Output:
+* Endpoint returns 404 for non-existent IDs, 403 for cross-company access, and proceeds for valid combinations.
+* Response format scaffolded (e.g., `{ "file_id": "string", "status": "processing_started" }` placeholder). 
+  Testing Instructions:
+* Hit the endpoint with:
+
+  * Invalid UUID → 400/404.
+  * Valid UUID from another company → 403.
+  * Valid UUID for this company → 200 with expected JSON.
+    Dependencies:
+* Step 8 (File table + RLS policies). 
+* Step 9.5 (File records exist).
+
+---
+
+Step 9.7 — Configure n8n Webhook URL & Secrets (HUMAN + Code Integration)
+Description:
+
+* Add environment variables for the n8n webhook URL and API key/secret in `.env`/Vercel project settings, and create a small config helper (e.g., `/lib/pipeline/config`) to read them safely. This prepares the ingestion pipeline trigger endpoint.
+  Expected Output:
+* `.env.local` (and Vercel env) contains `N8N_INGESTION_WEBHOOK_URL` and any required auth token.
+* Config helper exposes a function returning validated URLs/tokens (throws if missing).
+  Testing Instructions:
+* Start dev server; ensure no runtime errors from missing envs.
+* Optionally log the parsed config in dev mode to confirm values are loaded (without exposing them in production).
+  Dependencies:
+* Step 7 (n8n inbound/outbound endpoints concept defined). 
+
+---
+
+Step 9.8 — Implement Pipeline Trigger Logic in `/api/files/:id/process`
+Description:
+
+* Extend `/api/files/:id/process` to call the n8n webhook (or equivalent pipeline trigger endpoint), passing the file ID, company ID, and storage path as payload, and update the `File.status` to `processing` on successful trigger.
+  Expected Output:
+* Successful call updates DB: `status` moves from `uploaded` to `processing`.
+* Endpoint returns `{ "file_id": "…", "status": "processing_started" }` as per Master Document. 
+  Testing Instructions:
+* Call `/api/files/:id/process` for a real file.
+* Check n8n workflow execution logs to confirm receipt.
+* Verify the `File` row status is updated to `processing`.
+  Dependencies:
+* Step 9.6 (endpoint skeleton).
+* Step 9.7 (n8n config ready).
+
+---
+
+Step 9.9 — Auto-Trigger Processing from `/api/files/upload`
+Description:
+
+* After creating the `File` record on upload, optionally auto-call the `/api/files/:id/process` logic (direct function call or second HTTP call) so that the ingestion pipeline starts without a separate manual step, while still allowing manual re-trigger later. 
+  Expected Output:
+* Uploading a file results in both:
+
+  * A `File` record with `status='processing'` shortly after.
+  * A sent event to n8n to start OCR/extraction.
+    Testing Instructions:
+* Upload a file via the upload endpoint.
+* Confirm:
+
+  * Storage file exists.
+  * `File` record appears and transitions to `processing`.
+  * n8n logs show the workflow fired for that file ID.
+    Dependencies:
+* Step 9.5 (upload creates record).
+* Step 9.8 (processing trigger works).
+
+---
+
+Step 9.10 — Wire Documents Screen Upload UI to `/api/files/upload`
+Description:
+
+* Replace the mock/fake upload behavior on the Documents screen with a real React Query mutation (or fetch) that calls `/api/files/upload` with multipart form-data from the drag-and-drop/file picker UI.
+  Expected Output:
+* Selecting or dragging a file from the Documents screen sends a request to the real upload endpoint.
+* On success, the UI receives the `file_id` and updates local state/cache so the new file appears in the documents list.
+  Testing Instructions:
+* In the browser, open the Documents screen.
+* Upload a PDF/image/CSV and:
+
+  * Check DevTools Network tab for a successful `/api/files/upload` request.
+  * Verify the new document appears in the list (either instantly or after a refetch).
+    Dependencies:
+* Step 4 (Documents page layout with drag-and-drop area). 
+* Step 6 (mock documents list already in place). 
+* Step 9.3–9.5 (upload endpoint functional).
+
+---
+
+Step 9.11 — Show Upload & Processing Status in Documents List
+Description:
+
+* Extend the Documents list UI to display each file’s `status` (`uploaded`, `processing`, `processed`, `error`) and type, so the user can see where in the pipeline each file is.
+  Expected Output:
+* Each document row/card shows a status badge and type icon/label.
+* Status updates reflect DB values when the list is refetched.
+  Testing Instructions:
+* Upload several files; watch statuses in the UI and Supabase DB.
+* Manually change a file’s status in DB (e.g., to `error`) and refetch → UI should show updated status.
+  Dependencies:
+* Step 9.10 (Documents UI wired to backend).
+* Step 8 (status column exists on File table).
+
+---
+
+Step 9.12 — Add Manual “Reprocess” Action for a File
+Description:
+
+* Add a button or menu action on each document row (e.g., “Reprocess”) that calls `/api/files/:id/process` to re-trigger the ingestion pipeline for files stuck in `error` or `uploaded` state.
+  Expected Output:
+* Clicking “Reprocess” sends a POST to `/api/files/:id/process`.
+* On success, the file’s status updates to `processing` in the UI.
+  Testing Instructions:
+* Set a file status to `error` or leave as `uploaded`.
+* Click “Reprocess” and confirm:
+
+  * Network request succeeds.
+  * Status badge updates to `processing`.
+  * n8n logs show a new processing event.
+    Dependencies:
+* Step 9.6–9.8 (process endpoint and trigger implemented).
+* Step 9.11 (documents list rendering status).
+
+---
+
+Step 9.13 — End-to-End Verification: Upload → Storage → DB → Pipeline Trigger
+Description:
+
+* Perform a full manual E2E test of the ingestion pipeline using a realistic invoice/bank file: from the Documents UI upload, through Supabase Storage + DB record, to n8n receiving the webhook. This validates that Step 9 fulfills “File Upload → Storage → Pipeline Trigger” as described in the Steps and Master Documents.
+  Expected Output:
+* A documented test run where:
+
+  * User uploads a file from the UI.
+  * File appears in Supabase Storage.
+  * Corresponding `File` record is created and status transitions to `processing`.
+  * n8n workflow logs show the file ID received and ready for OCR (handled in Step 10).
+    Testing Instructions:
+* Execute the full flow and capture:
+
+  * Browser screenshots of upload + document list.
+  * Supabase Storage + DB screenshots.
+  * n8n workflow log screenshot showing the trigger payload.
+    Dependencies:
+* Step 9.1–9.12 completed.
