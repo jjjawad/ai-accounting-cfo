@@ -1206,3 +1206,282 @@ pm run lint.
 * Notes:
 
   * Auth remains placeholder-friendly until real Supabase credentials are provided. Listener unsubscribes on unmount to avoid leaks.
+
+### STEP 7.1 - Create Backend Utility & Response Helpers - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/server/api/_utils/types.ts
+  * backend/server/api/_utils/responses.ts
+  * backend/server/api/_utils/index.ts
+  * backend/app/api/ping/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully; /api/ping is wired to return a 200 JSON response `{ "message": "pong" }` via the new `ok` helper (manual hit pending a real dev server).
+* Notes:
+
+  * Added shared API response/type helpers aligned with the `{ error, code, details }` contract and a simple `/api/ping` route that exercises the success helper. Existing routes are unchanged for now; later steps will adopt these utilities.
+
+### STEP 7.2 - Add Supabase Server Client Helper - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/lib/supabase/server-client.ts
+  * backend/app/api/debug-supabase/route.ts
+* Files MODIFIED:
+
+  * backend/package.json
+  * backend/package-lock.json
+  * buildlog.md
+* Dependencies ADDED:
+
+  * @supabase/supabase-js (backend, matches frontend version)
+* Config changes:
+
+  * None (relies on SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars)
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. `/api/debug-supabase` returns `{ "ok": true }` when env vars are set; with missing env the route responds via `serverError` without crashing.
+* Notes:
+
+  * Introduced singleton `getSupabaseServerClient` using the service role key with `persistSession: false`. Added a temporary `/api/debug-supabase` route to verify server client creation; no database operations were added.
+
+### STEP 7.3 - Implement Auth Extraction & Guard Helpers - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/lib/auth/server-auth.ts
+  * backend/app/api/auth-test/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. `/api/auth-test` returns 401 with standard JSON error when no Supabase auth token is present and 200 with `{ "message": "Authenticated", "email": ..., "userId": ... }` when a valid token is supplied.
+* Notes:
+
+  * Auth helpers decode Supabase JWT from Authorization header or cookies to derive `{ userId, email }` without DB calls. `requireUser` throws a standardized 401 via the shared response helper; no membership/role checks yet.
+
+### STEP 7.4 - Scaffold File Upload & Processing API Routes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/app/api/files/upload/route.ts
+  * backend/app/api/files/[id]/process/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth is enforced; unauthenticated requests will return 401 via shared helpers. Stubbed responses return 200 with `{ status: "stubbed" }` payloads when minimally valid input and auth are present.
+* Notes:
+
+  * Added placeholder file upload and processing endpoints that validate presence of `file`/`company_id` or `id`, enforce auth via `requireUser`, and return standardized stub JSON. No storage, OCR, or processing implemented yet.
+
+### STEP 7.5 - Scaffold Transactions API Routes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/app/api/companies/[companyId]/transactions/route.ts
+  * backend/app/api/companies/[companyId]/transactions/categorize/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth enforced via `requireUser`; stubbed responses return 200 with empty transactions list or `{ status: "stubbed", count }` when minimally valid input and auth are present.
+* Notes:
+
+  * Added placeholder transactions list and batch categorize endpoints scoped by URL `companyId`, validating params/body and returning standardized JSON via shared helpers. No database or categorization logic implemented yet.
+
+### STEP 7.6 - Scaffold VAT Summary & Returns API Routes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/server/api/companies/[companyId]/vat/summary/route.ts
+  * backend/server/api/companies/[companyId]/vat/returns/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth enforced via `requireUser`; summary endpoint returns stub VAT summary when `period_start` and `period_end` are provided, and returns 400 on missing params. Returns endpoint responds with a stubbed VAT return object when valid period dates are provided and 400 when they are missing.
+* Notes:
+
+  * Endpoints currently return hard-coded VAT data only, matching the expected summary/return shapes. No real VAT calculations or database access implemented yet.
+
+### STEP 7.7 - Scaffold Dashboard & Cashflow API Routes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/app/api/companies/[companyId]/dashboard/overview/route.ts
+  * backend/app/api/companies/[companyId]/cashflow/forecast/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth enforced via `requireUser`; dashboard overview returns stubbed metrics and cashflow forecast returns a generated series with default/capped days, both returning 400 on invalid companyId.
+* Notes:
+
+  * Added stub dashboard and cashflow endpoints returning static/demo data matching the expected contracts. No real calculations or database calls yet; shapes are ready for frontend wiring and later backend logic.
+
+### STEP 7.8 - Scaffold Chat CFO API Route - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/server/api/companies/[companyId]/chat/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth enforced via `requireUser`; valid requests return stubbed Chat CFO payload. Invalid JSON, missing/empty `message`, invalid `context_limit`, or missing `companyId` return 400 via shared helpers.
+* Notes:
+
+  * Added stubbed Chat CFO endpoint that validates `companyId` and request body, returning a static `assistant_message` and empty `details`. No LLM or database logic implemented yet.
+
+### STEP 7.9 - Scaffold Admin API Routes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/server/api/admin/companies/[companyId]/review-items/route.ts
+  * backend/server/api/admin/transactions/[id]/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Auth enforced via `requireUser`; review-items returns stub `{ transactions: [], documents: [] }`, and transaction patch returns `{ status: "stubbed" }` when minimally valid input is provided. Invalid params/body return 400 via shared helpers.
+* Notes:
+
+  * Added placeholder admin review and transaction patch endpoints; role enforcement and persistence will be added later once roles and data storage are in place.
+
+### STEP 7.10 - Scaffold n8n Inbound Webhook Endpoints - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/server/api/webhooks/n8n/file-processed/route.ts
+  * backend/server/api/webhooks/n8n/pipeline-status/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None (relies on N8N_WEBHOOK_SECRET environment variable)
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Webhook endpoints validate `x-n8n-secret`; missing/invalid secret returns unauthorized, missing env returns server error, valid secret returns stubbed 200 JSON `{ status: "stubbed", endpoint: ... }`.
+* Notes:
+
+  * Added stubbed n8n webhook endpoints secured via shared secret; no business logic yet. Both endpoints return minimal stub responses and will be wired to real workflows later.
+
+### STEP 7.11 - Implement Outbound n8n Trigger Helper - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/lib/pipeline/n8n-client.ts
+  * backend/server/api/debug-n8n/route.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None (relies on N8N_BASE_URL and N8N_API_KEY env vars)
+* Testing result:
+
+  * Ran `npm run build` (backend placeholder) successfully. Debug route `/api/debug-n8n` calls `triggerWorkflow(\"test\", { ping: true })`; any errors surface via `serverError`, otherwise returns stubbed result envelope via `ok`.
+* Notes:
+
+  * Added a thin n8n trigger helper using native fetch with placeholder webhook path and optional bearer API key; temporary debug route exercises it. No production endpoints wired yet; adjust URL/auth when real n8n config is known.
+
+### STEP 7.12 - HUMAN REVIEW: Finalize API Naming & RLS Strategy Notes - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * docs/backend-api.md
+* Files MODIFIED:
+
+  * docs/backend-api.md
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Manually reviewed backend/server/api and app/api route structure; confirmed URL patterns align with company/file/admin/webhook conventions. Documented current routes and RLS plan. Ran `npm run build` (backend placeholder) successfully.
+* Notes:
+
+  * No route renames were required. Documented the planned company_id-based RLS strategy for Step 8 and captured current stubbed endpoints in docs/backend-api.md.
