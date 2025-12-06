@@ -21,3 +21,5 @@ export interface JournalLine {
   created_at: string;
   updated_at: string;
 }
+
+export type { File, FileStatus, FileType } from './file';

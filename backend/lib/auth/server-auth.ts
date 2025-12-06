@@ -1,9 +1,15 @@
 import { unauthorized } from "../../server/api/_utils/responses";
+import { getSupabaseServerClient } from "../supabase/server-client";
 
 export interface AuthenticatedUser {
   userId: string;
   email: string | null;
   rawToken?: string;
+}
+
+export interface MembershipContext {
+  membershipId: string;
+  role: string | null;
 }
 
 function getAccessTokenFromRequest(request: Request): string | null {
@@ -83,4 +89,32 @@ export async function requireUser(request: Request): Promise<AuthenticatedUser> 
   }
 
   return user;
+}
+
+export async function assertUserBelongsToCompany(params: {
+  userId: string;
+  companyId: string;
+}): Promise<MembershipContext> {
+  const { userId, companyId } = params;
+  const supabase = getSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("memberships")
+    .select("id, role")
+    .eq("user_id", userId)
+    .eq("company_id", companyId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error("MEMBERSHIP_LOOKUP_FAILED");
+  }
+
+  if (!data) {
+    throw new Error("NOT_COMPANY_MEMBER");
+  }
+
+  return {
+    membershipId: data.id,
+    role: data.role ?? null,
+  };
 }

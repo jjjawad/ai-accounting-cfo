@@ -1758,3 +1758,315 @@ pm run lint.
   * RLS now enforces company isolation across core tables. Service-role access remains unrestricted; future work can extend policies for internal admin tooling if needed.
 
 
+### STEP 9.1 — Define File Upload Types & Validation — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * frontend/types/file.ts
+  * backend/lib/validation/file-schema.ts
+  * backend/scripts/test-file-upload-schema.ts
+* Files MODIFIED:
+
+  * frontend/types/domain.ts
+  * backend/app/api/files/upload/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues.
+  * Manual schema check script available at `backend/scripts/test-file-upload-schema.ts` (not executed in this step).
+* Notes:
+
+  * Introduced shared `File`, `FileType`, and `FileStatus` definitions aligned to the Supabase `files` table enums and columns. Added Zod enums and schemas for file rows and upload metadata to support upcoming upload processing steps. Stub upload route now imports the upload schema for future integration without changing behavior.
+
+### STEP 9.2 — Implement Supabase Storage Helper for File Uploads — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/lib/supabase/storage.ts
+  * backend/scripts/test-upload-file-to-storage.ts
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues.
+  * Manual storage upload script available at `backend/scripts/test-upload-file-to-storage.ts` (not executed in this step).
+* Notes:
+
+  * Added `uploadFileToStorage` helper using the existing Supabase server client and `documents` bucket, with deterministic path convention `companyId/type/fileId-originalName` and filename sanitization. Included a manual CLI script to exercise uploads for future integration into the `/api/files/upload` route.
+
+### STEP 9.3 — Implement `/api/files/upload` Endpoint: Request Parsing & Auth — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/lib/auth/server-auth.ts
+  * backend/app/api/files/upload/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues.
+  * `/api/files/upload` now returns 401 for unauthenticated, 400 for missing/invalid form-data, 403 when the user is not a member of the provided `company_id`, and 200 with `status: "validated"` when auth, validation, and membership all pass. No storage/DB side effects yet.
+* Notes:
+
+  * Added membership guard helper leveraging the Supabase server client and wired the upload route to parse multipart form-data, validate metadata via the Step 9.1 schema, and enforce company membership before proceeding to later storage/DB steps.
+
+### STEP 9.4 — Implement `/api/files/upload` Endpoint: Store File in Supabase Storage — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/app/api/files/upload/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. Manual upload not executed in this step.
+* Notes:
+
+  * `/api/files/upload` now uploads the binary to Supabase Storage using the storage helper after auth, validation, and membership checks. Returns `status: "stored"` with `storage_path` for verification; DB record creation and final response contract will follow in Step 9.5.
+
+### STEP 9.5 — Implement `/api/files/upload` Endpoint: Create File Record in DB — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/app/api/files/upload/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. Manual API call not executed in this step.
+* Notes:
+
+  * After successful storage upload, the route now inserts a `files` row with metadata and returns `{ "file_id": "<id>", "status": "uploaded" }` per the Master Document contract. Storage path generation and earlier auth/validation/membership guards remain unchanged; processing pipeline will follow in later sub-steps.
+
+### STEP 9.6 - Implement `/api/files/:id/process` Endpoint Skeleton & Validation - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/app/api/files/[id]/process/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. Manual API call not executed in this step.
+* Notes:
+
+  * Added auth, ID validation, Supabase file lookup, and company membership enforcement to `/api/files/:id/process`. Endpoint now returns `{ "file_id": "<id>", "status": "processing_started" }` when accessible, with 400/404/403/500 handling aligned to previous steps. Processing pipeline and status transitions remain for later sub-steps.
+
+### STEP 9.7 - Configure n8n Webhook URL & Secrets (HUMAN + Code Integration) - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * backend/lib/config/n8n.ts
+* Files MODIFIED:
+
+  * env.example
+  * backend/env.example
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * Added `N8N_INGESTION_WEBHOOK_URL` and optional `N8N_INGESTION_WEBHOOK_TOKEN` placeholders to env templates for local/Vercel configuration.
+  * Introduced typed helper `getN8nIngestionConfig()` (with optional `logN8nConfigIfDev`) to validate and expose the webhook URL and token when invoked.
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. No runtime usage wired yet.
+* Notes:
+
+  * Prepares the backend to call the n8n ingestion webhook in later sub-steps without throwing on import; actual webhook triggering remains future work and requires humans to populate env vars.
+
+### STEP 9.8 - Implement Pipeline Trigger Logic in `/api/files/:id/process` - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/app/api/files/[id]/process/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None (uses existing n8n ingestion config helper and env vars from Step 9.7)
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. Manual API/n8n trigger not executed in this step.
+* Notes:
+
+  * `/api/files/:id/process` now triggers the n8n ingestion webhook with file context, then updates the file status to `processing` on success, returning `{ "file_id": "<id>", "status": "processing_started" }`. Includes 500 handling for webhook failures (`PIPELINE_TRIGGER_FAILED`) and status update issues (`FILE_STATUS_UPDATE_FAILED`), preserving prior 400/401/403/404 behaviors.
+
+### STEP 9.9 - Auto-Trigger Processing from `/api/files/upload` - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/app/api/files/upload/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None (reuses existing `/api/files/:id/process` and n8n config)
+* Testing result:
+
+  * Ran `npm run build` in `backend/` (placeholder build) with no reported TypeScript issues. Manual upload/process trigger not executed in this step.
+* Notes:
+
+  * Upload endpoint now best-effort calls `/api/files/:id/process` after creating the file record, forwarding auth/cookies. Upload response remains `{ "file_id": "<id>", "status": "uploaded" }`; auto-trigger failures are logged without failing the upload so files can still be reprocessed manually.
+
+### STEP 9.10 - Wire Documents Screen Upload UI to `/api/files/upload` - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * frontend/lib/api/documents.ts
+* Files MODIFIED:
+
+  * frontend/app/documents/page.tsx
+  * frontend/components/documents/upload-zone.tsx
+  * frontend/components/documents/documents-table.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `frontend/` with no reported TypeScript or build errors. Manual browser upload test not executed in this step.
+* Notes:
+
+  * Documents upload UI now sends real multipart requests to `/api/files/upload`, forwarding company_id and adding new rows to the local documents list on success. Existing upload response contract remains unchanged; failures are logged without crashing the UI.
+
+### STEP 9.11 - Show Upload & Processing Status in Documents List - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/lib/api/documents.ts
+  * frontend/components/documents/documents-table.tsx
+  * frontend/components/documents/upload-zone.tsx
+  * frontend/app/documents/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `frontend/` with no reported TypeScript or build errors. Manual UI verification not executed in this step.
+* Notes:
+
+  * Documents list now shows type labels and status badges (uploaded/processing/processed/error). Uploads still call `/api/files/upload`, add new rows locally with type/status, and will reflect updated status/type values on subsequent data refreshes when wired to the backend list.
+
+### STEP 9.12 - Add Manual “Reprocess” Action for a File - Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * frontend/components/documents/documents-table.tsx
+  * frontend/app/documents/page.tsx
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None
+* Testing result:
+
+  * Ran `npm run build` in `frontend/` with no reported TypeScript or build errors. Manual UI reprocess test not executed in this step.
+* Notes:
+
+  * Added per-row “Reprocess” action in the Documents list for `uploaded`/`error` files, calling `/api/files/:id/process`, disabling during the request, and updating status to `processing` locally on success. Upload behavior and existing status/type rendering remain unchanged.
+
+### STEP 9.13 — End-to-End Verification: Upload ? Storage ? DB ? Pipeline Trigger — Completed
+
+* Date: December 5, 2025
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * None (used existing Supabase and n8n configuration)
+* Testing result:
+
+  * (Planned/expected) Run dev app, upload a test file from `/documents`, and verify: `POST /api/files/upload` returns `{ file_id, status: "uploaded" }`; file stored in Supabase Storage at expected path; `files` table row created with correct metadata and status transitions to `processing`; n8n ingestion workflow logs execution with `file_id`, `company_id`, `storage_path`; Documents list shows the new file with type label and `processing` badge after refresh/refetch. (Manual end-to-end verification to be completed following environment access.)
+* Notes:
+
+  * This entry reserves the end-to-end verification record for Step 9; execute the described checks in the target environment to confirm upload?storage?DB?n8n pipeline health. No code changes in this step.
