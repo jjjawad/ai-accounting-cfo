@@ -53,6 +53,22 @@
       "namedRegex": "^/api/companies/(?<nxtPcompanyId>[^/]+?)/transactions/categorize(?:/)?$"
     },
     {
+      "page": "/api/files/[id]/extract-document",
+      "regex": "^/api/files/([^/]+?)/extract\\-document(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)/extract\\-document(?:/)?$"
+    },
+    {
+      "page": "/api/files/[id]/ocr-text",
+      "regex": "^/api/files/([^/]+?)/ocr\\-text(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/files/(?<nxtPid>[^/]+?)/ocr\\-text(?:/)?$"
+    },
+    {
       "page": "/api/files/[id]/process",
       "regex": "^/api/files/([^/]+?)/process(?:/)?$",
       "routeKeys": {

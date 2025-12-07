@@ -13,6 +13,7 @@ export const FileStatusEnum = z.enum([
   "uploaded",
   "processing",
   "processed",
+  "needs_review",
   "error",
 ] satisfies readonly FileStatus[]);
 

@@ -23,6 +23,7 @@ function StatusBadge({ status }: { status: DocumentStatus }) {
     uploaded: "Uploaded",
     processing: "Processing",
     processed: "Processed",
+    needs_review: "Needs review",
     error: "Error",
   };
 
@@ -30,6 +31,7 @@ function StatusBadge({ status }: { status: DocumentStatus }) {
     uploaded: "bg-gray-100 text-gray-800 border border-gray-200",
     processing: "bg-blue-50 text-blue-700 border border-blue-200",
     processed: "bg-green-50 text-green-700 border border-green-200",
+    needs_review: "bg-amber-50 text-amber-700 border border-amber-200",
     error: "bg-red-50 text-red-700 border border-red-200",
   };
 

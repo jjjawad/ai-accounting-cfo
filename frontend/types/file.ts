@@ -1,6 +1,6 @@
 export type FileType = 'bank_statement' | 'invoice' | 'receipt' | 'pdc' | 'other';
 
-export type FileStatus = 'uploaded' | 'processing' | 'processed' | 'error';
+export type FileStatus = 'uploaded' | 'processing' | 'processed' | 'needs_review' | 'error';
 
 export interface File {
   id: string;

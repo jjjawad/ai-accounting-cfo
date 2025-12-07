@@ -12,6 +12,9 @@ export interface MembershipContext {
   role: string | null;
 }
 
+// Dev flag – used by both auth bypass and membership bypass
+const DEV_BYPASS_AUTH = process.env.DEV_BYPASS_AUTH === "true";
+
 function getAccessTokenFromRequest(request: Request): string | null {
   const authHeader =
     request.headers.get("authorization") ?? request.headers.get("Authorization");
@@ -51,7 +54,9 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
-export async function getAuthenticatedUser(request: Request): Promise<AuthenticatedUser | null> {
+export async function getAuthenticatedUser(
+  request: Request
+): Promise<AuthenticatedUser | null> {
   const token = getAccessTokenFromRequest(request);
   if (!token) {
     return null;
@@ -91,11 +96,53 @@ export async function requireUser(request: Request): Promise<AuthenticatedUser> 
   return user;
 }
 
+// DEV-ONLY AUTH BYPASS HELPER
+// ----------------------------
+// Temporary wrapper so file upload/processing can work in dev before frontend auth is wired.
+// Behavior:
+// 1) Try normal requireUser(request).
+// 2) If that fails AND NODE_ENV !== "production" AND DEV_BYPASS_AUTH === "true" AND DEV_USER_ID is set,
+//    return a fake dev user.
+// 3) Otherwise rethrow so the route returns 401 as before.
+// TODO: Remove getUserOrDevBypass and use requireUser directly once real auth is implemented.
+export async function getUserOrDevBypass(request: Request): Promise<AuthenticatedUser> {
+  try {
+    return await requireUser(request);
+  } catch (err) {
+    const isDev = process.env.NODE_ENV !== "production";
+    const devUserId = process.env.DEV_USER_ID;
+
+    if (isDev && DEV_BYPASS_AUTH && devUserId) {
+      return {
+        userId: devUserId,
+        email: "dev-bypass@example.com",
+        rawToken: undefined,
+      };
+    }
+
+    throw err;
+  }
+}
+
 export async function assertUserBelongsToCompany(params: {
   userId: string;
   companyId: string;
 }): Promise<MembershipContext> {
   const { userId, companyId } = params;
+
+  // 🛠 DEV MODE: when DEV_BYPASS_AUTH=true, skip the Supabase membership check.
+  // This is ONLY for local development with the fake dev user.
+  if (DEV_BYPASS_AUTH && process.env.NODE_ENV !== "production") {
+    console.warn(
+      "[assertUserBelongsToCompany] DEV_BYPASS_AUTH=true - skipping membership check",
+      { userId, companyId }
+    );
+    return {
+      membershipId: "dev-bypass-membership",
+      role: "owner",
+    };
+  }
+
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase

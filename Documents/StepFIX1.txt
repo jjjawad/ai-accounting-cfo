@@ -1,0 +1,430 @@
+---
+
+## MISSION — FIX1 — Dev-only Auth Bypass for File Upload/Processing 
+
+## GOAL
+
+Temporarily enable **file upload and file processing in development** without full auth/sign-in wired, by:
+
+* Adding a **dev-only auth bypass helper** that pretends a specific test user is logged in when there is no real Supabase session.
+* Using that helper in the **file upload** and **file process** routes only.
+* Keeping this bypass **disabled in production** and clearly documented in `buildlog.md` so it can be removed once real auth is implemented.
+
+You have **already** added the environment variables in the backend env file (`DEV_BYPASS_AUTH`, `DEV_USER_ID`, optionally `DEV_COMPANY_ID`). The mission must **not** touch env files.
+
+## CONTEXT (ALREADY LOADED)
+
+The IDE should assume the following documents are available but must not modify them:
+
+* **Master Document** — architecture, auth, RLS, and file processing design.
+* **Steps Document** — roadmap up to Step 10 (document pipeline).
+* **Sub-Steps Document for Step 10** — current sub-step sequence.
+* **Build Log (`buildlog.md`)** — log of completed steps and fixes.
+
+Relevant context:
+
+* The backend is a Next.js app under `backend/` with route handlers like:
+
+  * `backend/app/api/files/upload/route.ts`
+  * `backend/app/api/files/[id]/process/route.ts`
+* Auth is currently not fully wired in the frontend, so calls from the browser to `/api/files/upload` return `401 Unauthorized`.
+* File endpoints use a shared auth helper (e.g. `requireUser`) to enforce that a Supabase-authenticated user is present before inserting into `files` or triggering processing.
+* You have set **dev-only env vars**:
+
+  * `DEV_BYPASS_AUTH=true`
+  * `DEV_USER_ID=<test-user-uuid>`
+  * `DEV_COMPANY_ID=<test-company-uuid>` (optional)
+
+The mission is to add a **small wrapper** around the existing auth helper and wire it into the file-related routes, then log this change.
+
+## SCOPE RULES
+
+* Implement **only** this temporary **dev-only auth bypass** for:
+
+  * `backend/app/api/files/upload/route.ts`
+  * `backend/app/api/files/[id]/process/route.ts`
+* Do **NOT**:
+
+  * Modify any env files (user already added variables).
+  * Change database schema, RLS policies, or Supabase configuration.
+  * Change business logic inside the routes (file storage, DB insert, n8n trigger, etc.).
+  * Touch other routes or global auth behavior.
+  * Enable this bypass in production; it must only work when `NODE_ENV !== "production"` **and** `DEV_BYPASS_AUTH === "true"`.
+
+The bypass must be:
+
+* **Clearly marked** as temporary in code comments.
+* **Documented** in `buildlog.md` with a TODO to remove it when real auth is implemented.
+
+## IMPLEMENTATION INSTRUCTIONS
+
+### 1. Add a dev-only auth bypass helper
+
+1. Open the backend auth helper file (adjust to actual path/name if different, but follow this intent):
+
+   * `backend/lib/auth/server-auth.ts`
+
+2. Locate the existing function (names may differ slightly):
+
+   * Something like `requireUser(req)` or `getServerUserOrThrow(req)`
+   * This currently throws/returns 401 when there is no authenticated Supabase user.
+
+3. **Do not change** the existing `requireUser` implementation.
+   Instead, **add a new helper** alongside it:
+
+   * Name: `getUserOrDevBypass` (or similar, but keep it clear).
+
+   * Behavior:
+
+     ```ts
+     import type { NextRequest } from "next/server";
+
+     const isDev = process.env.NODE_ENV !== "production";
+     const devBypass = process.env.DEV_BYPASS_AUTH === "true";
+
+     export async function getUserOrDevBypass(req: NextRequest) {
+       try {
+         // 1) Try normal auth first (real Supabase user)
+         const user = await requireUser(req); // or whatever your existing helper is
+         return user;
+       } catch (err) {
+         // 2) If no real user AND dev bypass is enabled, return fake dev user
+         if (isDev && devBypass && process.env.DEV_USER_ID) {
+           return {
+             userId: process.env.DEV_USER_ID,
+             // include any other fields your code expects, with dummy values:
+             email: "dev-bypass@example.com",
+           };
+         }
+
+         // 3) In production or without bypass, behave as before
+         throw err;
+       }
+     }
+     ```
+
+   * Adjust:
+
+     * The name and structure of the returned object to match what your routes currently expect from `requireUser` (e.g. `{ userId }`, `{ user }`, etc.).
+     * The import of `requireUser` or equivalent.
+
+4. Add a **big comment** above `getUserOrDevBypass`:
+
+   ```ts
+   // DEV-ONLY AUTH BYPASS HELPER
+   // ----------------------------
+   // This is a temporary wrapper around requireUser() so we can test file upload and processing
+   // from the frontend before full Supabase auth/login is implemented.
+   //
+   // Behavior:
+   // - First tries normal requireUser(req).
+   // - If that fails AND NODE_ENV !== "production" AND DEV_BYPASS_AUTH === "true"
+   //   AND DEV_USER_ID is set, it returns a fake dev user.
+   // - In production, or when DEV_BYPASS_AUTH is not enabled, it behaves exactly
+   //   like requireUser() and will still result in 401 for unauthenticated requests.
+   //
+   // TODO (Auth phase): Remove getUserOrDevBypass() and use requireUser(req) directly
+   // once real frontend auth is in place.
+   ```
+
+### 2. Use the helper in `/api/files/upload` route
+
+1. Open:
+
+   * `backend/app/api/files/upload/route.ts`
+
+2. Find where the route currently enforces auth. It likely has something like:
+
+   ```ts
+   import { requireUser } from "@/backend/lib/auth/server-auth";
+
+   export async function POST(req: NextRequest) {
+     const { userId } = await requireUser(req);
+     // ...
+   }
+   ```
+
+3. Change it to use the new helper:
+
+   * Update import:
+
+     ```ts
+     import { getUserOrDevBypass } from "@/backend/lib/auth/server-auth";
+     ```
+
+   * Update usage:
+
+     ```ts
+     const { userId } = await getUserOrDevBypass(req);
+     ```
+
+4. Do **not** change any other logic in this route:
+
+   * Keep file parsing, Supabase Storage upload, `files` insert, and any company/membership checks exactly as they are.
+   * The only difference is that in dev, when the browser has no session, the route will see `userId = DEV_USER_ID`.
+
+5. Add a short inline comment near the new call:
+
+   ```ts
+   // NOTE: Using getUserOrDevBypass() so uploads work in dev without real auth.
+   // See DEV-ONLY AUTH BYPASS HELPER in server-auth.ts for details and removal plan.
+   ```
+
+### 3. Use the helper in `/api/files/[id]/process` route
+
+1. Open:
+
+   * `backend/app/api/files/[id]/process/route.ts`
+
+2. Locate the auth check:
+
+   * It likely uses `requireUser(req)` at the top to ensure the user is authenticated before triggering processing / n8n.
+
+3. Change it similarly:
+
+   * Replace import of `requireUser` with `getUserOrDevBypass`.
+   * Use:
+
+     ```ts
+     const { userId } = await getUserOrDevBypass(req);
+     ```
+
+4. Again, **do not** change any of the actual file-processing logic:
+
+   * Keep any company membership checks, status transitions, or n8n trigger calls as they are.
+   * Only the source of `userId` is changed in dev.
+
+5. Add a similar note comment:
+
+   ```ts
+   // NOTE: Dev-only auth bypass for local testing; see server-auth.ts.
+   ```
+
+### 4. Ensure bypass is **dev-only**
+
+1. Confirm in `getUserOrDevBypass` that the condition:
+
+   ```ts
+   const isDev = process.env.NODE_ENV !== "production";
+   const devBypass = process.env.DEV_BYPASS_AUTH === "true";
+   ```
+
+   is enforced before returning the fake dev user.
+
+2. Confirm that if:
+
+   * `NODE_ENV === "production"` **OR**
+   * `DEV_BYPASS_AUTH` is not `"true"` **OR**
+   * `DEV_USER_ID` is not set,
+
+   then `getUserOrDevBypass` **just throws** like `requireUser`, resulting in 401 exactly as before.
+
+3. Do **not** reference `DEV_COMPANY_ID` here; that’s only for your own reference and potential debugging, not required for this bypass.
+
+### 5. Update `buildlog.md` with a FIX entry
+
+1. Open:
+
+   * `buildlog.md` (repository root).
+
+2. At the end of the file (or under any existing “FIX” section group), **append** a new entry with the title:
+
+   * `FIX — Dev-only Auth Bypass for File Upload/Processing — Implemented`
+
+3. Use the template in **AUTO BUILD LOG ENTRY** below, adjusting:
+
+   * The date.
+   * The file paths, if they differ slightly in your repo.
+
+4. If there is an existing entry describing a previous partial attempt at this same fix, **update that block instead of duplicating**.
+
+## FILES TO CREATE
+
+* **None** — this mission only adds code to existing modules and updates the build log.
+
+## FILES TO MODIFY
+
+* `backend/lib/auth/server-auth.ts`
+
+  * Add `getUserOrDevBypass(req)` helper that wraps the existing auth logic and returns a fake dev user only when:
+
+    * `NODE_ENV !== "production"`
+    * `DEV_BYPASS_AUTH === "true"`
+    * `DEV_USER_ID` is set
+    * And `requireUser(req)` fails.
+  * Add clear TODO comments indicating this is temporary and must be removed once real auth is implemented.
+
+* `backend/app/api/files/upload/route.ts`
+
+  * Replace usage of `requireUser(req)` (or equivalent) with `getUserOrDevBypass(req)` to get `userId`.
+  * Leave all business logic unchanged.
+
+* `backend/app/api/files/[id]/process/route.ts`
+
+  * Replace usage of `requireUser(req)` (or equivalent) with `getUserOrDevBypass(req)` to get `userId`.
+  * Leave all business logic unchanged.
+
+* `buildlog.md`
+
+  * Append/update a FIX entry documenting the dev-only auth bypass and its removal plan.
+
+## PATCH GUIDANCE (Optional)
+
+**Example minimal helper (adapt to your actual types/names):**
+
+```ts
+// backend/lib/auth/server-auth.ts
+import type { NextRequest } from "next/server";
+import { requireUser } from "./require-user"; // adjust import
+
+const isDev = process.env.NODE_ENV !== "production";
+const devBypass = process.env.DEV_BYPASS_AUTH === "true";
+
+// DEV-ONLY AUTH BYPASS HELPER
+// See mission description for behavior and removal plan.
+export async function getUserOrDevBypass(req: NextRequest) {
+  try {
+    const user = await requireUser(req);
+    return user;
+  } catch (err) {
+    if (isDev && devBypass && process.env.DEV_USER_ID) {
+      return {
+        userId: process.env.DEV_USER_ID,
+        email: "dev-bypass@example.com",
+      };
+    }
+    throw err;
+  }
+}
+```
+
+**Example usage in upload route:**
+
+```ts
+// backend/app/api/files/upload/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { getUserOrDevBypass } from "@/backend/lib/auth/server-auth";
+
+export async function POST(req: NextRequest) {
+  const { userId } = await getUserOrDevBypass(req); // Dev-only bypass here
+
+  // ...existing logic: parse multipart, upload to storage, insert into files, etc.
+}
+```
+
+**Example usage in process route:**
+
+```ts
+// backend/app/api/files/[id]/process/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import { getUserOrDevBypass } from "@/backend/lib/auth/server-auth";
+
+export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+  const { userId } = await getUserOrDevBypass(req); // Dev-only bypass here
+
+  const fileId = params.id;
+  // ...existing logic that triggers n8n / updates file status, etc.
+}
+```
+
+Adjust imports/paths to match your actual project.
+
+## TESTING INSTRUCTIONS
+
+1. **Build / type-check backend**
+
+   * From `backend/` (or monorepo root if that’s how it’s configured), run:
+
+     ```bash
+     npm run build
+     ```
+
+   * Confirm there are **no TypeScript errors**, especially around:
+
+     * `server-auth.ts`
+     * `files/upload` route
+     * `files/[id]/process` route
+
+2. **Verify dev behavior (bypass ON)**
+
+   * Ensure in `backend/.env.local` (already done by user, IDE should not change):
+
+     ```env
+     DEV_BYPASS_AUTH=true
+     DEV_USER_ID=<UUID of test user>
+     ```
+
+   * Run the backend dev server (`npm run dev` or equivalent).
+
+   * From the frontend, go to the Documents page and upload a test file.
+
+     * In browser DevTools → Network:
+
+       * `POST /api/files/upload` should respond with **200** (or your success code), not 401.
+     * In Supabase:
+
+       * A new row appears in `files` table, owned by the test user/company.
+
+   * If you have a “Reprocess” button that calls `/api/files/:id/process`, click it:
+
+     * `POST /api/files/:id/process` should also succeed (no 401).
+     * Any downstream behavior (status changes, logs, n8n webhook calls) should run as before.
+
+3. **Verify prod safety (bypass OFF)**
+
+   * Temporarily simulate a “prod-like” environment by:
+
+     * Unsetting `DEV_BYPASS_AUTH` or setting it to `false` in local env, and restarting dev server.
+   * Without a valid session:
+
+     * Calling `/api/files/upload` from the frontend should now return **401** again.
+   * This confirms:
+
+     * When the bypass is off, the system behaves exactly as before.
+
+4. **Update Build Log**
+
+   * Open `buildlog.md`.
+   * Confirm the new FIX entry exists and accurately describes:
+
+     * Files modified.
+     * Env flags used.
+     * Behavior in dev vs production.
+     * That this is **temporary** and should be removed once proper auth is wired.
+
+## AUTO BUILD LOG ENTRY
+
+STEP FIX1 — Dev-only Auth Bypass for File Upload/Processing — Completed
+
+* Date: <fill in today’s date>
+* Files CREATED:
+
+  * None
+* Files MODIFIED:
+
+  * backend/lib/auth/server-auth.ts
+  * backend/app/api/files/upload/route.ts
+  * backend/app/api/files/[id]/process/route.ts
+  * buildlog.md
+* Dependencies ADDED:
+
+  * None
+* Config changes:
+
+  * Introduced a dev-only auth bypass for file-related routes, controlled by env vars:
+
+    * `DEV_BYPASS_AUTH` (boolean-like, `"true"` to enable in dev)
+    * `DEV_USER_ID` (UUID of a test user already present in `users` + `memberships`)
+  * Added `getUserOrDevBypass(req)` in `server-auth.ts`, which:
+
+    * Calls the existing `requireUser(req)` (or equivalent auth helper) first.
+    * If there is no real session **and** `NODE_ENV !== "production"` **and** `DEV_BYPASS_AUTH === "true"` **and** `DEV_USER_ID` is set, returns a fake dev user object with `userId = DEV_USER_ID`.
+    * Otherwise, rethrows and the route still returns 401 as before.
+* Testing result:
+
+  * With `DEV_BYPASS_AUTH=true` and `DEV_USER_ID=<test-user-uuid>` set in `backend/.env.local`, the `/api/files/upload` and `/api/files/:id/process` routes can be called from the frontend without a real auth session and behave as if the dev user is authenticated (files are created/processed successfully in Supabase).
+  * When `DEV_BYPASS_AUTH` is unset/false or in an environment where `NODE_ENV="production"`, the routes revert to strict behavior and return 401 for unauthenticated requests, preserving production security.
+* Notes:
+
+  * **TEMPORARY:** This bypass exists solely to unblock local development and testing of the document pipeline (Step 10) before full Supabase auth/login is implemented in the frontend.
+  * Once real auth is wired (later Auth/Login step), `getUserOrDevBypass()` and its usages in file routes must be removed, and those routes should go back to using the standard `requireUser(req)` helper directly.

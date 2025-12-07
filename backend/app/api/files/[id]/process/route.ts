@@ -6,7 +6,7 @@ import {
   ok,
   serverError,
 } from "../../../../../server/api/_utils/responses";
-import { assertUserBelongsToCompany, requireUser } from "../../../../../lib/auth/server-auth";
+import { assertUserBelongsToCompany, getUserOrDevBypass } from "../../../../../lib/auth/server-auth";
 import { getSupabaseServerClient } from "../../../../../lib/supabase/server-client";
 import { getN8nIngestionConfig } from "../../../../../lib/config/n8n";
 
@@ -19,7 +19,8 @@ export async function POST(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await requireUser(request as unknown as Request);
+    // NOTE: Dev-only auth bypass enabled via getUserOrDevBypass for local testing.
+    const user = await getUserOrDevBypass(request as unknown as Request);
     const { id } = await context.params;
 
     if (!id || typeof id !== "string" || !isValidUuid(id)) {

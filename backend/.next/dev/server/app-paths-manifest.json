@@ -1,5 +1,6 @@
 {
-  "/api/debug-supabase/route": "app/api/debug-supabase/route.js",
-  "/api/ping/route": "app/api/ping/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/files/[id]/extract-document/route": "app/api/files/[id]/extract-document/route.js",
+  "/api/files/[id]/ocr-text/route": "app/api/files/[id]/ocr-text/route.js",
   "/page": "app/page.js"
 }

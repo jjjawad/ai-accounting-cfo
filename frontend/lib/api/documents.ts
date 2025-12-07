@@ -1,5 +1,5 @@
 export type DocumentType = "bank_statement" | "invoice" | "receipt" | "pdc" | "other";
-export type DocumentStatus = "uploaded" | "processing" | "processed" | "error";
+export type DocumentStatus = "uploaded" | "processing" | "processed" | "needs_review" | "error";
 
 // Read backend URL from env (set in .env.local + Vercel frontend env)
 const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;

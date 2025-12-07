@@ -119,6 +119,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/api/files/[id]/extract-document/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/files/[id]/extract-document">> = Specific
+  const handler = {} as typeof import("../../app/api/files/[id]/extract-document/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../app/api/files/[id]/ocr-text/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/files/[id]/ocr-text">> = Specific
+  const handler = {} as typeof import("../../app/api/files/[id]/ocr-text/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/api/files/[id]/process/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/files/[id]/process">> = Specific

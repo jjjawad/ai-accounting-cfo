@@ -1,4 +1,16 @@
-[00:00:07.089] Server  LOG      ✓ Ready in 4.8s
-[00:00:13.789] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:26.171] Server  LOG      ✓ Compiled in 550ms
-[00:01:28.963] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:01.667] Server  LOG      ✓ Ready in 1207ms
+[00:00:07.547] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:21.164] Server  ERROR   D:\Booksai\ai-accounting-cfo\backend\node_modules\next\dist\compiled\next-server\app-route-turbo.runtime.dev.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:21.167] Server  ERROR   D:\Booksai\ai-accounting-cfo\backend\.next\dev\server\chunks\[root-of-the-server]__1991d45a._.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:21.174] Server  ERROR   D:\Booksai\ai-accounting-cfo\backend\node_modules\next\dist\server\lib\trace\tracer.js: Invalid source map. Only conformant source maps can be used to find the original code. Cause: Error: sourceMapURL could not be parsed
+[00:00:21.177] Server  WARN    Error: Route "/api/files/[id]/ocr-text" used `params.id`. `params` is a Promise and must be unwrapped with `await` or `React.use()` before accessing its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+[00:00:21.294] Browser LOG     OCR endpoint response: {"code":"MISSING_FILE_ID","error":"Missing file id in URL"}
+[00:04:20.687] Server  WARN    [assertUserBelongsToCompany] DEV_BYPASS_AUTH=true - skipping membership check {}
+[00:04:20.963] Browser LOG     OCR endpoint response: {"file_id":"2540fde2-8a28-42e9-ab36-4043c686f592","status":"ocr_text_saved"}
+[00:04:29.125] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:04:38.386] Server  WARN    [assertUserBelongsToCompany] DEV_BYPASS_AUTH=true - skipping membership check {}
+[00:04:38.642] Browser LOG     OCR endpoint response: {"file_id":"2540fde2-8a28-42e9-ab36-4043c686f592","status":"ocr_text_saved"}
+[00:07:12.819] Browser ERROR   {}
+[00:11:54.124] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:12:00.562] Server  WARN    [assertUserBelongsToCompany] DEV_BYPASS_AUTH=true - skipping membership check {}
+[00:12:00.885] Browser LOG     Extract endpoint response: {"file_id":"2540fde2-8a28-42e9-ab36-4043c686f592","mode":"dev_stub","status":"processed"}

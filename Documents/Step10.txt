@@ -1,0 +1,229 @@
+Step 10.1 — Define Document Extraction Schema & Types
+Description:
+
+* Define a TypeScript + Zod schema for the **structured document extraction result** that represents invoices/receipts: vendor, invoice number, dates, currency, net/total amounts, VAT amounts/codes, and line items.
+* Align the shape with the existing `Invoice` and `InvoiceLineItem` models so the extraction output can be written directly into those tables.
+  Expected Output:
+* A reusable schema module (e.g. under `/lib/ai/document-extraction-schema.ts`) exporting a Zod schema and TypeScript type for an extracted document.
+* Clear mapping notes: which extracted fields go to which DB columns in `Invoice` and `InvoiceLineItem`.
+  Testing Instructions:
+* Run a small unit test (or simple script) that parses a hard-coded sample extraction JSON through the Zod schema and verifies it passes.
+* Confirm that each field from the schema has an obvious mapping to the DB models.
+  Dependencies:
+* Step 7 (backend scaffolding). 
+* Step 8 (DB schema for `files`, `invoices`, `invoice_line_items`).
+
+---
+
+Step 10.2 — Implement Document Extraction Prompt Template
+Description:
+
+* Create an OpenAI prompt template that instructs the model to:
+
+  * Take `ocr_text` (plus optional hints like file type) as input.
+  * Return **only** JSON matching the schema from Step 10.1 (no prose).
+* Include UAE/VAT-specific hints so the model extracts vendor, dates, amounts, currency, VAT and line items relevant for bookkeeping and VAT logic.
+  Expected Output:
+* A helper (e.g. `/lib/ai/document-extraction-prompt.ts`) that builds `system` + `user` messages for OpenAI using the schema from Step 10.1.
+* Clear comments describing expected JSON shape and failure behavior.
+  Testing Instructions:
+* Call the helper in a local test with fake `ocr_text` and inspect the final prompt string/messages.
+* Confirm that the schema description is embedded and that it clearly forbids non-JSON output.
+  Dependencies:
+* Step 10.1 (extraction schema).
+* Step 5 (state/infra for calling backend APIs where needed). 
+
+---
+
+Step 10.3 — Backend Helper to Persist OCR Text to File Record
+Description:
+
+* Implement a backend utility that, given `file_id` and `ocr_text`, updates the `File` row in Supabase (`ocr_text`, `status`, and `updated_at`). 
+* This gives n8n a simple HTTP endpoint to call after Google Vision returns text.
+  Expected Output:
+* A serverless API route (e.g. `POST /api/files/:id/ocr-text`) or reusable DB helper that:
+
+  * Validates the caller payload.
+  * Updates `file.ocr_text` and sets `status` to `"processing"` or `"processed_ocr"`.
+    Testing Instructions:
+* Manually call the endpoint (via Thunder Client/Postman) with a known `file_id` and sample `ocr_text`.
+* Verify in Supabase that the correct `File` row now contains the text and updated status.
+  Dependencies:
+* Step 7 (Supabase server client + API scaffolding). 
+* Step 8 (File table with `ocr_text`, `status`, `error_message`). 
+* Step 9 (file upload + basic pipeline trigger). 
+
+---
+
+Step 10.4 — n8n: Fetch File Binary from Supabase Storage
+Description:
+
+* Extend the existing n8n workflow (triggered in Step 9) so that given a `file_id`, it fetches the **actual file binary** from Supabase Storage using the stored `storage_path`.
+  Expected Output:
+* n8n node(s) that:
+
+  * Receive `file_id` (from `/api/files/:id/process` trigger).
+  * Query Supabase for the File row, read `storage_path`.
+  * Download the file binary and pass it along the workflow.
+    Testing Instructions:
+* Trigger the workflow for a known uploaded invoice PDF.
+* Confirm in n8n execution view that the binary data is present and `storage_path` matches Supabase.
+  Dependencies:
+* Step 1 (Supabase keys & n8n base setup). 
+* Step 8 (File table with storage metadata). 
+* Step 9 (n8n pipeline trigger from `/api/files/:id/process`). 
+
+---
+
+Step 10.5 — n8n: Send File to Google Vision and Capture OCR Text
+Description:
+
+* Add a Google Vision step in the n8n workflow that takes the file binary and returns extracted text for invoices/receipts, as per the Master Document’s OCR plan. 
+  Expected Output:
+* n8n node configured with Google Vision credentials that:
+
+  * Receives the binary.
+  * Outputs full OCR text in a field (e.g. `data.ocrText`).
+    Testing Instructions:
+* Run the workflow for one sample invoice image/PDF.
+* Inspect the workflow’s output to verify that OCR text contains vendor, totals, etc. in readable form.
+  Dependencies:
+* Step 10.4 (binary available in workflow).
+* Step 1 (Google Vision API credentials). 
+
+---
+
+Step 10.6 — n8n: Persist OCR Text to Supabase via Backend Helper
+Description:
+
+* Add an HTTP step in n8n that calls the backend helper from Step 10.3 to save the OCR text into the `File` record.
+* Ensure status transitions correctly to indicate OCR has run.
+  Expected Output:
+* n8n node calling `/api/files/:id/ocr-text` (or equivalent) with `{ ocr_text }`.
+* The File row shows `ocr_text` populated after workflow run.
+  Testing Instructions:
+* Execute the workflow for a test file.
+* Check Supabase to confirm `ocr_text` matches the text generated in Step 10.5.
+  Dependencies:
+* Step 10.3 (backend helper).
+* Step 10.5 (OCR text produced).
+
+---
+
+Step 10.7 — Backend: Implement Document Extraction Endpoint Using OpenAI
+Description:
+
+* Implement a serverless endpoint (e.g. `POST /api/files/:id/extract-document`) that:
+
+  * Loads the File row and its `ocr_text`.
+  * Uses the prompt template from Step 10.2 and OpenAI to generate structured JSON.
+  * Validates the response against the Zod schema from Step 10.1.
+    Expected Output:
+* A fully working endpoint that returns a validated `ExtractedDocument` object or a clear error.
+* Basic logging of failures (e.g. invalid JSON) into `SystemLog` for later admin use.
+  Testing Instructions:
+* Call the endpoint directly with a `file_id` that already has `ocr_text`.
+* Verify that for a clean sample invoice, you get a populated JSON object with vendor, totals, and line items.
+* Confirm that invalid responses are rejected with a 4xx/5xx error and a log entry.
+  Dependencies:
+* Step 5 (backend OpenAI client wiring). 
+* Step 10.1, 10.2 (schema + prompt).
+* Step 10.3 (File has `ocr_text`).
+
+---
+
+Step 10.8 — Create Invoice & Line Items from Extraction Result
+Description:
+
+* Implement backend logic that takes a validated `ExtractedDocument` and:
+
+  * Inserts an `Invoice` row (supplier/customer type, dates, currency, totals, VAT).
+  * Inserts related `InvoiceLineItem` rows.
+  * Associates any inferred vendor with the existing `Vendor` table or leaves `vendor_id` null if unknown.
+    Expected Output:
+* A reusable function (e.g. `/lib/pipeline/create-invoice-from-extraction.ts`) or part of the endpoint from Step 10.7 that writes to `invoices` and `invoice_line_items`.
+* New DB records correctly populated for a sample invoice.
+  Testing Instructions:
+* Manually trigger extraction for a known invoice file.
+* Check Supabase: confirm that an `Invoice` row exists, with matching totals, and that line items represent OCR’d items.
+  Dependencies:
+* Step 8 (Invoice + InvoiceLineItem tables).
+* Step 10.7 (validated extraction result).
+
+---
+
+Step 10.9 — Link File to Invoice and Update File Status
+Description:
+
+* After creating invoice records, update the corresponding `File` row to:
+
+  * Set `type` to `'invoice'` or `'receipt'` based on extraction.
+  * Store a reference to the created `Invoice` (e.g. via `file_id` in Invoice or a join field, as per your chosen mapping).
+  * Set `status` to `"processed"` or `"needs_review"` depending on confidence/field completeness.
+    Expected Output:
+* File records now reflect their semantic role (invoice vs receipt) and processing status.
+* A clear, deterministic rule in code for when to mark `"needs_review"` (e.g. missing totals, low-confidence extraction).
+  Testing Instructions:
+* Process at least one clean invoice and one messy/partial invoice.
+* Verify that the clean one is marked `"processed"` and linked; the messy one is `"needs_review"` or similar.
+  Dependencies:
+* Step 8 (File + Invoice relations).
+* Step 10.8 (invoice creation).
+
+---
+
+Step 10.10 — Handle OCR/Extraction Errors and Populate `error_message`
+Description:
+
+* Implement robust error handling so that if Google Vision fails, OpenAI fails, or validation fails:
+
+  * The `File` record is updated with `status = 'error'`.
+  * `error_message` contains a concise description (e.g. `"OCR_FAILED"`, `"EXTRACTION_INVALID_JSON"`).
+    Expected Output:
+* Centralized error-handling paths in the backend/n8n workflow that always end with a consistent file status (`processed`, `needs_review`, or `error`).
+  Testing Instructions:
+* Force an error by:
+
+  * Providing a corrupt or unsupported file type.
+  * Temporarily breaking the OpenAI call (e.g. invalid key in a dev environment).
+* Confirm that the `File` row is set to `error` with a meaningful `error_message`, and no partial invoices are left orphaned.
+  Dependencies:
+* Step 10.5–10.9 (full pipeline in place).
+* Step 11/20 (will later build on this for more advanced edge-case handling).
+
+---
+
+Step 10.11 — n8n: Orchestrate Full Document Path for Invoice/Receipt Files
+Description:
+
+* Ensure the n8n workflow branches correctly so that:
+
+  * Files tagged as `invoice`/`receipt` (or `type=null`) follow the OCR + extraction + invoice-creation path from Steps 10.4–10.10.
+  * Bank statements are left for Step 11 (no statement parsing logic here).
+    Expected Output:
+* A single, coherent n8n workflow where the invoice/receipt path is fully wired from Supabase file → OCR → backend extraction → DB updates.
+  Testing Instructions:
+* Upload multiple files (e.g. two invoices, one bank statement).
+* Trigger `/api/files/:id/process` for each.
+* Confirm that invoice/receipt files produce invoices; bank statement files do **not** yet get parsed but complete without error.
+  Dependencies:
+* Step 9 (base workflow).
+* Step 10.4–10.10 (all pieces in place).
+
+---
+
+Step 10.12 — Human QA & Prompt Refinement Loop (HUMAN REQUIRED)
+Description:
+
+* Run a QA round on a small set of **real** UAE invoices/receipts.
+* Compare extracted invoices in the DB against the original documents; note common misreads (dates, VAT, vendor names).
+* Refine prompt template (Step 10.2) and possibly schema options (Step 10.1) to improve accuracy, especially around VAT amounts and line-item categorization.
+  Expected Output:
+* A short QA document (even as comments or notes) listing recurring issues and how the prompt/schema were adjusted.
+* Updated prompt/template checked into the repo.
+  Testing Instructions:
+* Re-run extraction on the QA sample set after refinements.
+* Confirm that accuracy is measurably better (fewer manual corrections needed for key fields vendor/date/total/VAT).
+  Dependencies:
+* Step 10.1–10.11 (end-to-end pipeline working).
+* Access to real sample documents for testing.
