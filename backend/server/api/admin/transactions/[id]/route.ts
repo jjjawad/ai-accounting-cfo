@@ -1,15 +1,14 @@
 import { NextRequest } from "next/server";
 import { ok, badRequest } from "../../../_utils/responses";
-import { requireUser } from "../../../../lib/auth/server-auth";
+import { requireUser } from "../../../../../lib/auth/server-auth";
 
-interface RouteContext {
-  params: { id: string };
-}
-
-export async function PATCH(request: NextRequest, context: RouteContext) {
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   await requireUser(request as unknown as Request);
 
-  const id = context?.params?.id;
+  const { id } = await context.params;
   if (!id || typeof id !== "string") {
     return badRequest("Missing or invalid transaction id", {
       code: "INVALID_PARAMS",

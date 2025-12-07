@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/auth-test/route": "app/api/auth-test/route.js",
+  "/api/companies/[companyId]/cashflow/forecast/route": "app/api/companies/[companyId]/cashflow/forecast/route.js",
+  "/api/companies/[companyId]/dashboard/overview/route": "app/api/companies/[companyId]/dashboard/overview/route.js",
+  "/api/companies/[companyId]/transactions/categorize/route": "app/api/companies/[companyId]/transactions/categorize/route.js",
+  "/api/companies/[companyId]/transactions/route": "app/api/companies/[companyId]/transactions/route.js",
+  "/api/companies/route": "app/api/companies/route.js",
+  "/api/debug-supabase/route": "app/api/debug-supabase/route.js",
+  "/api/files/[id]/process/route": "app/api/files/[id]/process/route.js",
+  "/api/files/upload/route": "app/api/files/upload/route.js",
+  "/api/ping/route": "app/api/ping/route.js",
+  "/page": "app/page.js"
+}

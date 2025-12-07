@@ -1,0 +1,3 @@
+{
+  "/api/companies/[companyId]/cashflow/forecast/route": "app/api/companies/[companyId]/cashflow/forecast/route.js"
+}

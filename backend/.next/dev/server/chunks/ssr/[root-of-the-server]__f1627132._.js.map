@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 14, "column": 0}, "map": {"version":3,"sources":["file:///D:/Booksai/ai-accounting-cfo/backend/app/page.tsx"],"sourcesContent":["export default function BackendHomePage() {\n  return (\n    <main style={{ padding: \"2rem\", fontFamily: \"system-ui\" }}>\n      <h1>AI Accounting Backend</h1>\n      <p>This is the backend API project. UI lives in the frontend app.</p>\n    </main>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAK,OAAO;YAAE,SAAS;YAAQ,YAAY;QAAY;;0BACtD,8OAAC;0BAAG;;;;;;0BACJ,8OAAC;0BAAE;;;;;;;;;;;;AAGT"}}]
+}

@@ -10,18 +10,17 @@ import { assertUserBelongsToCompany, requireUser } from "../../../../../lib/auth
 import { getSupabaseServerClient } from "../../../../../lib/supabase/server-client";
 import { getN8nIngestionConfig } from "../../../../../lib/config/n8n";
 
-interface RouteContext {
-  params: { id: string };
-}
-
 function isValidUuid(id: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 }
 
-export async function POST(request: NextRequest, context: RouteContext) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const user = await requireUser(request as unknown as Request);
-    const id = context?.params?.id;
+    const { id } = await context.params;
 
     if (!id || typeof id !== "string" || !isValidUuid(id)) {
       return badRequest("Invalid file id", { code: "INVALID_FILE_ID" });

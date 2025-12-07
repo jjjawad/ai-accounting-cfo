@@ -1,15 +1,16 @@
 import { NextRequest } from "next/server";
-import { ok, badRequest } from "../../../../../_utils/responses";
+import { ok, badRequest } from "../../../../_utils/responses";
 import { requireUser } from "../../../../../../lib/auth/server-auth";
 
-interface RouteContext {
-  params: { companyId: string };
-}
+type VatReturnBody = { period_start?: string; period_end?: string };
 
-export async function POST(request: NextRequest, context: RouteContext) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ companyId: string }> }
+) {
   await requireUser(request as unknown as Request);
 
-  const companyId = context?.params?.companyId;
+  const { companyId } = await context.params;
   if (!companyId || typeof companyId !== "string") {
     return badRequest("Missing or invalid companyId", {
       code: "INVALID_PARAMS",
@@ -17,15 +18,15 @@ export async function POST(request: NextRequest, context: RouteContext) {
     });
   }
 
-  let body: { period_start?: string; period_end?: string } | null = null;
+  let body: VatReturnBody | null = null;
   try {
-    body = (await request.json()) as typeof body;
+    body = (await request.json()) as VatReturnBody;
   } catch {
-    // Invalid JSON
+    body = null;
   }
 
-  const period_start = body?.period_start;
-  const period_end = body?.period_end;
+  const period_start = body?.period_start ?? null;
+  const period_end = body?.period_end ?? null;
 
   if (!period_start || !period_end) {
     return badRequest("period_start and period_end are required.", {

@@ -11,7 +11,7 @@ export async function triggerWorkflow(nameOrId: string, payload: unknown): Promi
   }
 
   // Placeholder path; adjust when the actual n8n endpoint shape is finalized.
-  const url = `${baseUrl.replace(/\\/$/, "")}/webhook/${nameOrId}`;
+  const url = `${baseUrl.replace(/\/$/, "")}/webhook/${nameOrId}`;
 
   try {
     const response = await fetch(url, {

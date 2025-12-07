@@ -2,14 +2,13 @@ import { NextRequest } from "next/server";
 import { ok, badRequest } from "../../../../../../server/api/_utils/responses";
 import { requireUser } from "../../../../../../lib/auth/server-auth";
 
-interface RouteContext {
-  params: { companyId: string };
-}
-
-export async function POST(request: NextRequest, context: RouteContext) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ companyId: string }> }
+) {
   await requireUser(request as unknown as Request);
 
-  const companyId = context?.params?.companyId;
+  const { companyId } = await context.params;
   if (!companyId || typeof companyId !== "string") {
     return badRequest("Missing or invalid companyId", {
       code: "INVALID_PARAMS",

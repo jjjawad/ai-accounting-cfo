@@ -1,4 +1,4 @@
-import { NextResponse, type NextResponseInit } from "next/server";
+import { NextResponse } from "next/server";
 import type { ApiResponseError } from "./types";
 
 function jsonError(
@@ -16,7 +16,7 @@ function jsonError(
   return NextResponse.json(body, { status });
 }
 
-export function ok<T>(data: T, init?: NextResponseInit): NextResponse<T> {
+export function ok<T>(data: T, init?: ResponseInit): NextResponse<T> {
   return NextResponse.json(data, { status: 200, ...init });
 }
 
@@ -39,6 +39,13 @@ export function notFound(
   options?: { code?: string; details?: unknown }
 ): NextResponse<ApiResponseError> {
   return jsonError(404, message, options?.code ?? "NOT_FOUND", options?.details);
+}
+
+export function forbidden(
+  message = "Forbidden",
+  options?: { code?: string; details?: unknown }
+): NextResponse<ApiResponseError> {
+  return jsonError(403, message, options?.code ?? "FORBIDDEN", options?.details);
 }
 
 export function serverError(

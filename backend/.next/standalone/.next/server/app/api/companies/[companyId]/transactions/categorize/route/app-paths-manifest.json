@@ -1,0 +1,3 @@
+{
+  "/api/companies/[companyId]/transactions/categorize/route": "app/api/companies/[companyId]/transactions/categorize/route.js"
+}

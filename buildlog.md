@@ -1,4 +1,4 @@
-  ### STEP 1.1 ó Initialize GitHub Repository & Base Directories ó Completed
+  ### STEP 1.1 ÔøΩ Initialize GitHub Repository & Base Directories ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/
@@ -14,7 +14,7 @@
     - Verified repository initialized, directories created, and first commit pushed. git status clean.
   - Notes:
     - This establishes the root structure required for all upcoming frontend and backend scaffolding.
-  ### STEP 1.2 ó Initialize Next.js TypeScript App in frontend ó Completed
+  ### STEP 1.2 ÔøΩ Initialize Next.js TypeScript App in frontend ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/package.json
@@ -34,7 +34,7 @@
   pm run dev and verified the default Next.js starter page loads at http://localhost:3000.
   - Notes:
     - Frontend baseline setup is complete; ready for Tailwind integration in Step 1.3.
-  ### STEP 1.3 ó Add Tailwind CSS to the Next.js Frontend ó Completed
+  ### STEP 1.3 ÔøΩ Add Tailwind CSS to the Next.js Frontend ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/tailwind.config.js
@@ -54,7 +54,7 @@
   pm run dev and verified Tailwind styles render correctly on the homepage.
   - Notes:
     - Tailwind setup completed. Ready for shadcn installation in Step 1.4.
-  ### STEP 1.4 ó Install and Configure shadcn UI in Frontend ó Completed
+  ### STEP 1.4 ÔøΩ Install and Configure shadcn UI in Frontend ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/.shadcn/*
@@ -71,7 +71,7 @@
     - Verified shadcn Button renders correctly at http://localhost:3000.
   - Notes:
     - shadcn UI successfully installed; project is ready for UI component scaffolding in later steps.
-  ### STEP 1.5 ó Scaffold Backend Folder for Serverless Functions ó Completed
+  ### STEP 1.5 ÔøΩ Scaffold Backend Folder for Serverless Functions ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - backend/package.json
@@ -90,7 +90,7 @@
     - Verified backend folder structure exists and npm install + npm run dev complete without errors.
   - Notes:
     - Backend workspace prepared. Ready for Supabase and API scaffolding in later steps.
-  ### STEP 1.6 ó Create Supabase Project (DB + Storage + Auth Baseline) ó Completed
+  ### STEP 1.6 ÔøΩ Create Supabase Project (DB + Storage + Auth Baseline) ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - supabase/
@@ -107,7 +107,7 @@
   - Notes:
     - Environment variables will be added in Step 1.10.
     - No Supabase schema or tables created yet.
-  ### STEP 1.7 ó Configure Supabase Auth & Storage Defaults ó Completed
+  ### STEP 1.7 ÔøΩ Configure Supabase Auth & Storage Defaults ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - backend/lib/supabase-client.ts
@@ -124,7 +124,7 @@
     - Placeholder backend files created successfully.
   - Notes:
     - Real Supabase client integration will occur after environment variables are added in Step 1.10.
-  ### STEP 1.8 ó Retrieve Supabase Keys and Project URL ó Completed
+  ### STEP 1.8 ÔøΩ Retrieve Supabase Keys and Project URL ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - env.example
@@ -141,7 +141,7 @@
   - Notes:
     - Actual environment variables will be inserted in Step 1.10.
     - Keys are NOT stored in the repository for security reasons.
-  ### STEP 1.9 ó Set Up External API Providers (OpenAI, Google Vision, Email) ó Completed
+  ### STEP 1.9 ÔøΩ Set Up External API Providers (OpenAI, Google Vision, Email) ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - backend/lib/external/
@@ -159,7 +159,7 @@
     - Human verified external provider keys exist.
   - Notes:
     - Real provider clients will be wired in Step 1.10.
-  ### STEP 1.10 ó Create Local .env Files for Frontend and Backend ó Completed
+  ### STEP 1.10 ÔøΩ Create Local .env Files for Frontend and Backend ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/.env.local
@@ -177,7 +177,7 @@
   - Notes:
     - Real keys must be added manually by developer.
     - Backend and frontend will be fully wired to Supabase/Auth/AI in subsequent steps.
-  ### STEP 1.11 ó Connect GitHub Repository to Vercel and Configure Environment ó Completed
+  ### STEP 1.11 ÔøΩ Connect GitHub Repository to Vercel and Configure Environment ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - vercel/
@@ -194,8 +194,8 @@
     - Verified successful Vercel deployment of the Next.js frontend.
     - Confirmed env vars load correctly in Vercel environment.
   - Notes:
-    - Step 1 is now fully completed. The project is ready for Step 2 ó Folder & File Structure.
-  ### STEP 2.1 ó Create Core Client-Facing App Routes ó Completed
+    - Step 1 is now fully completed. The project is ready for Step 2 ÔøΩ Folder & File Structure.
+  ### STEP 2.1 ÔøΩ Create Core Client-Facing App Routes ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/app/dashboard/page.tsx
@@ -216,7 +216,7 @@
   pm run dev.
   - Notes:
     - These pages are placeholders only; full UI is implemented in Step 4.
-  ### STEP 2.2 ó Create Admin Route Skeleton ó Completed
+  ### STEP 2.2 ÔøΩ Create Admin Route Skeleton ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/app/admin/page.tsx
@@ -230,7 +230,7 @@
     - Verified that /admin loads successfully and displays placeholder "Admin Home".
   - Notes:
     - This is the base admin entry route; detailed admin screens will be added in future steps.
-  ### STEP 2.3 ó Create Frontend /lib Domain Folders ó Completed
+  ### STEP 2.3 ÔøΩ Create Frontend /lib Domain Folders ÔøΩ Completed
   - Date: December 2, 2025
   - Files CREATED:
     - frontend/lib/ai/index.ts
@@ -253,7 +253,7 @@
     - Optional smoke test import resolved correctly.
   - Notes:
     - These folders form the long-term domain structure for AI, OCR, VAT, pipeline, and accounting logic.
-### STEP 2.4 ó Create Backend /server/api Endpoint Folder Structure ó Completed
+### STEP 2.4 ÔøΩ Create Backend /server/api Endpoint Folder Structure ÔøΩ Completed
 - Date: December 5, 2025
 - Files CREATED:
   - backend/server/api/auth/index.ts
@@ -276,7 +276,7 @@
   - Backend build and lint ran successfully with no module resolution errors.
 - Notes:
   - Folder skeleton ready for Step 7 backend scaffolding; no functional endpoints implemented yet.
-### STEP 2.5 ó Create Shared /types Folder for Domain & API Interfaces ó Completed
+### STEP 2.5 ÔøΩ Create Shared /types Folder for Domain & API Interfaces ÔøΩ Completed
 - Date: December 2, 2025
 - Files CREATED:
   - types/domain.ts
@@ -293,7 +293,7 @@ pm run build.
   - Optional smoke test: temporary import from types/ resolved correctly and then removed.
 - Notes:
   - These placeholder files will be expanded during Step 8 (Database Schema) and later backend API steps.
-### STEP 2.6 ó Align Frontend & Backend Imports with New Structure ó Completed
+### STEP 2.6 ÔøΩ Align Frontend & Backend Imports with New Structure ÔøΩ Completed
 - Date: December 2, 2025
 - Files CREATED:
   - None
@@ -315,7 +315,7 @@ pm run lint.
 - Notes:
   - Temporary imports were removed after validation.
   - Project structure is fully aligned for upcoming Step 2.7 (human review).
-### STEP 2.7 ó Human Review & Approval of Folder / Route Structure ó Completed
+### STEP 2.7 ÔøΩ Human Review & Approval of Folder / Route Structure ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - None
@@ -338,7 +338,7 @@ pm run lint.
 - Notes:
   - Step 2 is fully approved and locked in as the foundation for all subsequent steps.
 
-### STEP 3.1 ó Create Global App Layout (Shell) ó Completed
+### STEP 3.1 ÔøΩ Create Global App Layout (Shell) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - None
@@ -352,7 +352,7 @@ pm run lint.
   - Verified `/dashboard` and `/transactions` now share a unified global layout shell with Tailwind base styles applied.
 - Notes:
   - This layout provides the structural foundation for sidebar + header additions in later Step 3 sub-steps.
-### STEP 3.2 ó Implement Sidebar Navigation Structure (Static Items Only) ó Completed
+### STEP 3.2 ÔøΩ Implement Sidebar Navigation Structure (Static Items Only) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/sidebar.tsx
@@ -366,7 +366,7 @@ pm run lint.
   - Verified sidebar displays on all routes with correct static navigation labels and layouts remain functional.
 - Notes:
   - Sidebar contains no links or active state yet; this will be implemented in Steps 3.3 and 3.4.
-### STEP 3.3 ó Wire Navigation Links to All Routes ó Completed
+### STEP 3.3 ÔøΩ Wire Navigation Links to All Routes ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - None
@@ -380,7 +380,7 @@ pm run lint.
   - Confirmed all sidebar items navigate to existing routes (`/dashboard`, `/transactions`, `/documents`, `/vat`, `/cashflow`, `/chat`, `/settings`, `/admin`). No layout regressions observed.
 - Notes:
   - Active state highlighting will be added in Step 3.4.
-### STEP 3.4 ó Add Active Navigation State Highlight ó Completed
+### STEP 3.4 ÔøΩ Add Active Navigation State Highlight ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - None
@@ -394,11 +394,11 @@ pm run lint.
   - Verified active state highlights correctly using `usePathname()` and persists across refresh; deep paths (e.g., `/admin/users`) highlight parent item.
 - Notes:
   - Sidebar navigation is now interactive and visually stateful; header creation comes next.
-### STEP 3.5 ó Create Header Component (Top Bar Shell) ó Completed
+### STEP 3.5 ÔøΩ Create Header Component (Top Bar Shell) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/header.tsx
-### STEP 4.9 ó Admin Review Queue Static Screen ó Completed
+### STEP 4.9 ÔøΩ Admin Review Queue Static Screen ÔøΩ Completed
 - Date: 2025-12-03
 - Files CREATED:
   - frontend/app/admin/review/page.tsx
@@ -425,7 +425,7 @@ pm run lint.
   - Verified header displays across all routes above page content, layout stable with sidebar + header combination.
 - Notes:
   - Placeholder-only header; company switcher and user UI will be added in Steps 3.6+.
-### STEP 3.6 ó Implement Company Switcher UI (Static, No Backend) ó Completed
+### STEP 3.6 ÔøΩ Implement Company Switcher UI (Static, No Backend) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/company-switcher.tsx
@@ -440,7 +440,7 @@ pm run lint.
   - Verified static company switcher dropdown appears in header and opens with placeholder options ("Company A", "Company B"). No state changes as expected.
 - Notes:
   - UI-only implementation using local dropdown primitives compatible with shadcn Button; real selection logic follows in Step 3.7.
-### STEP 3.7 ó Hook Company Switcher Into URL State (Client-Side Only) ó Completed
+### STEP 3.7 ÔøΩ Hook Company Switcher Into URL State (Client-Side Only) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/company-provider.tsx
@@ -455,7 +455,7 @@ pm run lint.
   - Verified the company switcher updates using client-side context state; selection persists across navigation and resets on reload as expected.
 - Notes:
   - Completes temporary client-side selection system; auth/state persistence to be added in later steps.
-### STEP 3.8 ó Implement Protected Routes Wrapper (Auth Required) ó Completed
+### STEP 3.8 ÔøΩ Implement Protected Routes Wrapper (Auth Required) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/protected-route.tsx
@@ -466,10 +466,10 @@ pm run lint.
 - Config changes:
   - None
 - Testing result:
-  - Verified ProtectedRoute blocks access when session is null and renders placeholder ìNot logged in.î
+  - Verified ProtectedRoute blocks access when session is null and renders placeholder ÔøΩNot logged in.ÔøΩ
 - Notes:
   - Wrapper ready to be applied to pages in Step 3.9; real Supabase session wiring comes in Step 5+.
-### STEP 3.9 ó Wrap All App Pages With ProtectedRoute ó Completed
+### STEP 3.9 ÔøΩ Wrap All App Pages With ProtectedRoute ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - None
@@ -487,10 +487,10 @@ pm run lint.
 - Config changes:
   - None
 - Testing result:
-  - Verified that all pages now correctly display ìNot logged in.î and no protected content is visible. Layout remains intact and stable.
+  - Verified that all pages now correctly display ÔøΩNot logged in.ÔøΩ and no protected content is visible. Layout remains intact and stable.
 - Notes:
   - Finalizes UI protection layer; real auth logic will replace placeholder in Step 5+.
-### STEP 3.10 ó Add User Menu (Avatar + Dropdown) ó Completed
+### STEP 3.10 ÔøΩ Add User Menu (Avatar + Dropdown) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/user-menu.tsx
@@ -501,10 +501,10 @@ pm run lint.
 - Config changes:
   - None
 - Testing result:
-  - Verified avatar renders in header; dropdown opens and shows static ìProfileî and ìLogoutî items. Layout remains stable alongside company switcher.
+  - Verified avatar renders in header; dropdown opens and shows static ÔøΩProfileÔøΩ and ÔøΩLogoutÔøΩ items. Layout remains stable alongside company switcher.
 - Notes:
   - Pure UI step. Real auth-aware menu will be implemented during Step 5 (Auth Integration).
-### STEP 3.11 ó Add Layout Loading & Skeleton States ó Completed
+### STEP 3.11 ÔøΩ Add Layout Loading & Skeleton States ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/app/loading.tsx
@@ -520,7 +520,7 @@ pm run lint.
 - Notes:
   - Prepares app for async session loading and data fetching in Step 5 and beyond.
 
-### STEP 4.1 ó Dashboard Static Layout (Overview Screen) ó Completed
+### STEP 4.1 ÔøΩ Dashboard Static Layout (Overview Screen) ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/dashboard/summary-card.tsx
@@ -536,7 +536,7 @@ pm run lint.
 - Notes:
   - This is a pure static layout implementation; no backend integration or real data. Prepares the dashboard for Step 6 mock data wiring and Step 16 backend aggregation.
 
-### STEP 4.2 ó Transactions Screen Static Table Skeleton ó Completed
+### STEP 4.2 ÔøΩ Transactions Screen Static Table Skeleton ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/transactions/table.tsx (if created)
@@ -551,7 +551,7 @@ pm run lint.
 - Notes:
   - Static-only implementation. No state or data binding. Prepares Transactions page for Step 6 mock data and Step 11 real transaction ingestion.
 
-### STEP 4.3 ó Documents Screen Layout with Drag-and-Drop Area ó Completed
+### STEP 4.3 ÔøΩ Documents Screen Layout with Drag-and-Drop Area ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/documents/upload-zone.tsx
@@ -567,7 +567,7 @@ pm run lint.
 - Notes:
   - Pure UI-only implementation; no real upload logic. Prepares for Step 9 (real upload pipeline) and Step 10 (OCR processing).
 
-### STEP 4.4 ó VAT Screen Static Layout ó Completed
+### STEP 4.4 ÔøΩ VAT Screen Static Layout ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/vat/vat-summary-card.tsx
@@ -583,7 +583,7 @@ pm run lint.
 - Notes:
   - Pure static UI. Prepares the VAT screen for later backend integration in Steps 14 and 16.
 
-### STEP 4.5 ó Cashflow / CFO Screen Static Forecast UI ó Completed
+### STEP 4.5 ÔøΩ Cashflow / CFO Screen Static Forecast UI ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/cashflow/forecast-chart-placeholder.tsx
@@ -600,7 +600,7 @@ pm run lint.
 - Notes:
   - Static UI only. Prepares screen for Step 15 (forecast logic) and Step 16 (dashboard data aggregation).
 
-### STEP 4.6 ó Chat CFO Static Interface ó Completed
+### STEP 4.6 ÔøΩ Chat CFO Static Interface ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/chat/message-bubble.tsx
@@ -617,7 +617,7 @@ pm run lint.
 - Notes:
   - Pure static UI; prepares page for Step 17 (real Chat CFO backend).
 
-### STEP 4.7 ó Settings Screen Static Forms ó Completed
+### STEP 4.7 ÔøΩ Settings Screen Static Forms ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/settings/section-card.tsx
@@ -635,7 +635,7 @@ pm run lint.
 - Notes:
   - Pure UI-only implementation. Backend wiring will occur in Steps 5, 7, and 25.
 
-### STEP 4.8 ó Admin Companies List Static Screen ó Completed
+### STEP 4.8 ÔøΩ Admin Companies List Static Screen ÔøΩ Completed
 - Date: December 3, 2025
 - Files CREATED:
   - frontend/components/admin/companies-table.tsx
@@ -649,7 +649,7 @@ pm run lint.
   - Verified admin companies list displays static header, card, and placeholder table rows. No backend calls. No console errors. Layout matches admin UI style and is responsive.
 - Notes:
   - Static UI only. Backend-driven admin dashboard will be implemented in Step 18.
-### STEP 4.9 ó Admin Review Queue Static Screen ó Completed
+### STEP 4.9 ÔøΩ Admin Review Queue Static Screen ÔøΩ Completed
 - Date: December 5, 2025
 - Files CREATED:
   - frontend/app/admin/review/page.tsx
@@ -668,7 +668,7 @@ pm run lint.
   - Pure static UI; real review logic and low-confidence data integration will be implemented in Step 18.
 
 
-### STEP 5.1 ó Install React Query & Create QueryClient Provider ó Completed
+### STEP 5.1 ÔøΩ Install React Query & Create QueryClient Provider ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -693,7 +693,7 @@ pm run lint.
   * React Query global provider infrastructure is now in place with `AppQueryClientProvider` wrapping the entire app in `layout.tsx`. No actual queries or DevTools have been added yet; these will be implemented in later Step 5 sub-steps.
 
 
-### STEP 5.2 ó Add React Query DevTools (Optional but recommended) ó Completed
+### STEP 5.2 ÔøΩ Add React Query DevTools (Optional but recommended) ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -718,7 +718,7 @@ pm run lint.
   * DevTools fully integrated and safe for future query debugging.
 
 
-### STEP 5.3 ó Create CompanyContext for Active Company State ó Completed
+### STEP 5.3 ÔøΩ Create CompanyContext for Active Company State ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -742,7 +742,7 @@ pm run lint.
   * Global company state is now established; UI wiring and server integration will occur in subsequent sub-steps.
 
 
-### STEP 5.4 ó Connect Company Switcher UI to CompanyContext ó Completed
+### STEP 5.4 ÔøΩ Connect Company Switcher UI to CompanyContext ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -766,7 +766,7 @@ pm run lint.
   * Temporary mock list used. Backend data integration will occur in Step 5.5+.
 
 
-### STEP 5.5 ó Implement Base `/companies` API Route (Mock Data) ó Completed
+### STEP 5.5 ÔøΩ Implement Base `/companies` API Route (Mock Data) ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -789,7 +789,7 @@ pm run lint.
   * Endpoint currently returns static mock data; authentication + DB queries will be implemented in future sub-steps.
 
 
-### STEP 5.6 ó Implement `useCompaniesQuery` Hook (React Query) ó Completed
+### STEP 5.6 ÔøΩ Implement `useCompaniesQuery` Hook (React Query) ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -812,7 +812,7 @@ pm run lint.
   * Hook ready for integration in Step 5.7.
 
 
-### STEP 5.7 ó Connect Company Switcher UI to `useCompaniesQuery` ó Completed
+### STEP 5.7 ÔøΩ Connect Company Switcher UI to `useCompaniesQuery` ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -836,7 +836,7 @@ pm run lint.
   * UI now reflects live server data; next steps will introduce authenticated + dynamic + persistent company selection.
 
 
-### STEP 5.8 ó Persist Selected Company in Local Storage ó Completed
+### STEP 5.8 ÔøΩ Persist Selected Company in Local Storage ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -860,7 +860,7 @@ pm run lint.
   * Persistence is client-side only. Server-side persistence will be implemented in later steps.
 
 
-### STEP 5.9 ó Auto-Select First Company on Initial Load ó Completed
+### STEP 5.9 ÔøΩ Auto-Select First Company on Initial Load ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -884,7 +884,7 @@ pm run lint.
   * This behavior ensures smooth onboarding flow before backend-aware company linking is implemented in later steps.
 
 
-### STEP 5.10 ó Create `useActiveCompany` Hook ó Completed
+### STEP 5.10 ÔøΩ Create `useActiveCompany` Hook ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -907,7 +907,7 @@ pm run lint.
   * This hook becomes the single source of truth for components needing full active-company data rather than just the ID.
 
 
-### STEP 5.11 ó Add Server Companies Schema & Response Validation (Zod) ó Completed
+### STEP 5.11 ÔøΩ Add Server Companies Schema & Response Validation (Zod) ÔøΩ Completed
 
 * Date: 2025-12-03
 * Files CREATED:
@@ -930,7 +930,7 @@ pm run lint.
 
   * Backend is now schema-aware; future DB integration will rely on this schema.
 
-### STEP 6.1 ó Create Mock Data Module ó Completed
+### STEP 6.1 ÔøΩ Create Mock Data Module ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -953,7 +953,7 @@ pm run lint.
 
   * Central mock data module added for Step 6, covering overview metrics, income/expense series, transactions, VAT summary, PDC items, cashflow forecast, and chat history. Data is not yet wired into the UI; currently imported only for console verification. `buildlog.md` was updated by appending this entry without modifying any existing content.
 
-### STEP 6.2 ó Wire Dashboard Summary Cards to Mock Overview Data ó Completed
+### STEP 6.2 ÔøΩ Wire Dashboard Summary Cards to Mock Overview Data ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -976,7 +976,7 @@ pm run lint.
 
   * Static values removed; summary cards now reflect dynamic mock overview data for Step 6. Charts and other pages remain unchanged.
 
-### STEP 6.3 ó Wire Income vs Expenses Chart to Mock Data ó Completed
+### STEP 6.3 ÔøΩ Wire Income vs Expenses Chart to Mock Data ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -999,7 +999,7 @@ pm run lint.
 
   * Only the Income vs Expenses chart behavior was changed; other charts remain placeholders. No new libraries were added.
 
-### STEP 6.4 ó Wire Recent Transactions Table to Mock Data ó Completed
+### STEP 6.4 ÔøΩ Wire Recent Transactions Table to Mock Data ÔøΩ Completed
 
 * Date: December 3, 2025
 * Files CREATED:
@@ -1022,7 +1022,7 @@ pm run lint.
 
   * Only dashboard transaction preview wired. Full Transactions module wiring happens later in Step 6.10.
 
-### STEP 6.5 ó Add `useMockOverview` Hook ó Completed
+### STEP 6.5 ÔøΩ Add `useMockOverview` Hook ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1046,7 +1046,7 @@ pm run lint.
 
   * This step establishes the hook-based data layer needed for Step 7 (API integration). The hook currently returns mock data with isLoading/isError flags set to false.
 
-### STEP 6.6 ó Add `useMockIncomeExpense` Hook ó Completed
+### STEP 6.6 ÔøΩ Add `useMockIncomeExpense` Hook ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1069,7 +1069,7 @@ pm run lint.
 
   * Establishes hook-based abstraction for income/expense chart data, preparing Step 7 API integration without UI refactors.
 
-### STEP 6.7 ó Add `useMockTransactions` Hook ó Completed
+### STEP 6.7 ÔøΩ Add `useMockTransactions` Hook ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1093,7 +1093,7 @@ pm run lint.
 
   * Centralizes dashboard transactions access via a hook, preparing Step 7 API integration without any UI refactor.
 
-### STEP 6.8 ó Implement VAT Summary Mock Hook ó Completed
+### STEP 6.8 ÔøΩ Implement VAT Summary Mock Hook ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1115,7 +1115,7 @@ pm run lint.
 
   * Establishes the VAT data abstraction layer for Step 7 API wiring. VAT module UI wiring occurs later in Step 6.11.
 
-### STEP 6.9 ó Implement Cashflow Forecast Mock Hook ó Completed
+### STEP 6.9 ÔøΩ Implement Cashflow Forecast Mock Hook ÔøΩ Completed
 
 * Date: December 4, 2025
 * Files CREATED:
@@ -1486,7 +1486,7 @@ pm run lint.
 
   * No route renames were required. Documented the planned company_id-based RLS strategy for Step 8 and captured current stubbed endpoints in docs/backend-api.md.
 
-### STEP 8.1 ó Create Core Identity & Multi-Tenancy Tables (users, companies, memberships) ó Completed
+### STEP 8.1 ÔøΩ Create Core Identity & Multi-Tenancy Tables (users, companies, memberships) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1508,7 +1508,7 @@ pm run lint.
 
   * Established the core identity and multi-tenancy backbone for the platform. `memberships` now link users to companies with a constrained `membership_role` enum (`owner`, `member`, `admin`). These tables will be reused by later Step 8 sub-steps, RLS policies, and all company-scoped queries.
 
-### STEP 8.2 ó Implement Bank Accounts & Transactions Tables (bank_accounts, bank_transactions) ó Completed
+### STEP 8.2 ÔøΩ Implement Bank Accounts & Transactions Tables (bank_accounts, bank_transactions) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1531,7 +1531,7 @@ pm run lint.
 
   * Added core banking schema for multi-company support. `bank_accounts` are linked to `companies`, and `bank_transactions` are linked to both `companies` and `bank_accounts` with a status enum (`raw`, `categorized`, `reconciled`). Additional relationships (files, vendors, categories, VAT codes) will be wired up in later Step 8 sub-steps.
 
-### STEP 8.3 ó Implement File/Documents Table (files) ó Completed
+### STEP 8.3 ÔøΩ Implement File/Documents Table (files) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1554,7 +1554,7 @@ pm run lint.
 
   * Added the core `files` metadata table to support uploaded documents (bank statements, invoices, receipts, PDCs, other). This will back the upload endpoints and future links from bank transactions, invoices, and other entities in later steps.
 
-### STEP 8.4 ó Implement Vendor, Category & VAT Code Tables ó Completed
+### STEP 8.4 ÔøΩ Implement Vendor, Category & VAT Code Tables ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1576,7 +1576,7 @@ pm run lint.
 
   * Added the core vendor, category, and VAT code tables with required foreign keys. Indexes, RLS policies, and seeded defaults will be handled in later Step 8 sub-steps.
 
-### STEP 8.5 ó Implement Invoice & Line Item Tables (invoices, invoice_line_items) ó Completed
+### STEP 8.5 ÔøΩ Implement Invoice & Line Item Tables (invoices, invoice_line_items) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1599,7 +1599,7 @@ pm run lint.
 
   * Implemented the core invoice header and line-item schema with required foreign keys to companies, vendors, files, VAT codes, and categories. Additional indexes and RLS will follow in later Step 8 tasks.
 
-### STEP 8.6 ó Implement PDC Table (pdc_items) ó Completed
+### STEP 8.6 ÔøΩ Implement PDC Table (pdc_items) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1646,7 +1646,7 @@ pm run lint.
 
   * Added the journal backbone with company-scoped entries, source tracking (`bank_tx`, `invoice`, `pdc`, `manual`), and per-line debits/credits with optional `vat_code_id`. Indexing and RLS will follow in later Step 8 tasks.
 
-### STEP 8.8 ó Implement VAT Return Table (`vat_returns`) ó Completed
+### STEP 8.8 ÔøΩ Implement VAT Return Table (`vat_returns`) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1668,7 +1668,7 @@ pm run lint.
 
   * `vat_returns` schema matches the `VatReturn` model from the Master Document and Step 8.8 specification. Ready for future VAT calculation logic and RLS policies.
 
-### STEP 8.9 ó Implement Cashflow Snapshot Table (`cashflow_snapshots`) ó Completed
+### STEP 8.9 ÔøΩ Implement Cashflow Snapshot Table (`cashflow_snapshots`) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1691,7 +1691,7 @@ pm run lint.
 
   * Added the cashflow forecasting snapshot backbone, storing per-company forecast series and derived burn/runway metrics. Indexing and additional constraints will be handled in Step 8.11; generation/updates will come in later backend steps.
 
-### STEP 8.10 ó Implement Chat & Logging Tables (chat_messages, system_logs) ó Completed
+### STEP 8.10 ÔøΩ Implement Chat & Logging Tables (chat_messages, system_logs) ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1713,7 +1713,7 @@ pm run lint.
 
   * `chat_messages` now backs Chat CFO history with constrained roles and company/user linkage; `system_logs` stores structured events per company or globally. Indexing and RLS will be handled in later Step 8 tasks.
 
-### STEP 8.11 ó Add Foreign Keys, Relationships & Indexes ó Completed
+### STEP 8.11 ÔøΩ Add Foreign Keys, Relationships & Indexes ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1735,7 +1735,7 @@ pm run lint.
 
   * Added a global pass of FK coverage for optional bank transaction relations and index coverage across Step 8 tables to enforce referential integrity and optimize common company-scoped queries (transactions, invoices, PDCs, journals, VAT, cashflow, chat, and logs).
 
-### STEP 8.12 ó Implement RLS Policies for Company Isolation ó Completed
+### STEP 8.12 ÔøΩ Implement RLS Policies for Company Isolation ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1752,13 +1752,13 @@ pm run lint.
   * Enabled Row Level Security and added SELECT policies on all company-scoped tables to enforce membership-based multi-tenancy and global vs company-specific behavior for categories and VAT codes.
 * Testing result:
 
-  * Applied the RLS migration to Supabase successfully. Using ìRun as userî for two test users with memberships in different companies, verified each user only sees data for their companies; a user with no memberships sees zero rows. Global `categories`/`vat_codes` rows (`company_id IS NULL`) are visible to all; company-specific rows are restricted by membership.
+  * Applied the RLS migration to Supabase successfully. Using ÔøΩRun as userÔøΩ for two test users with memberships in different companies, verified each user only sees data for their companies; a user with no memberships sees zero rows. Global `categories`/`vat_codes` rows (`company_id IS NULL`) are visible to all; company-specific rows are restricted by membership.
 * Notes:
 
   * RLS now enforces company isolation across core tables. Service-role access remains unrestricted; future work can extend policies for internal admin tooling if needed.
 
 
-### STEP 9.1 ó Define File Upload Types & Validation ó Completed
+### STEP 9.1 ÔøΩ Define File Upload Types & Validation ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1785,7 +1785,7 @@ pm run lint.
 
   * Introduced shared `File`, `FileType`, and `FileStatus` definitions aligned to the Supabase `files` table enums and columns. Added Zod enums and schemas for file rows and upload metadata to support upcoming upload processing steps. Stub upload route now imports the upload schema for future integration without changing behavior.
 
-### STEP 9.2 ó Implement Supabase Storage Helper for File Uploads ó Completed
+### STEP 9.2 ÔøΩ Implement Supabase Storage Helper for File Uploads ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1809,7 +1809,7 @@ pm run lint.
 
   * Added `uploadFileToStorage` helper using the existing Supabase server client and `documents` bucket, with deterministic path convention `companyId/type/fileId-originalName` and filename sanitization. Included a manual CLI script to exercise uploads for future integration into the `/api/files/upload` route.
 
-### STEP 9.3 ó Implement `/api/files/upload` Endpoint: Request Parsing & Auth ó Completed
+### STEP 9.3 ÔøΩ Implement `/api/files/upload` Endpoint: Request Parsing & Auth ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1834,7 +1834,7 @@ pm run lint.
 
   * Added membership guard helper leveraging the Supabase server client and wired the upload route to parse multipart form-data, validate metadata via the Step 9.1 schema, and enforce company membership before proceeding to later storage/DB steps.
 
-### STEP 9.4 ó Implement `/api/files/upload` Endpoint: Store File in Supabase Storage ó Completed
+### STEP 9.4 ÔøΩ Implement `/api/files/upload` Endpoint: Store File in Supabase Storage ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -1857,7 +1857,7 @@ pm run lint.
 
   * `/api/files/upload` now uploads the binary to Supabase Storage using the storage helper after auth, validation, and membership checks. Returns `status: "stored"` with `storage_path` for verification; DB record creation and final response contract will follow in Step 9.5.
 
-### STEP 9.5 ó Implement `/api/files/upload` Endpoint: Create File Record in DB ó Completed
+### STEP 9.5 ÔøΩ Implement `/api/files/upload` Endpoint: Create File Record in DB ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -2025,7 +2025,7 @@ pm run lint.
 
   * Documents list now shows type labels and status badges (uploaded/processing/processed/error). Uploads still call `/api/files/upload`, add new rows locally with type/status, and will reflect updated status/type values on subsequent data refreshes when wired to the backend list.
 
-### STEP 9.12 - Add Manual ìReprocessî Action for a File - Completed
+### STEP 9.12 - Add Manual ÔøΩReprocessÔøΩ Action for a File - Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -2047,9 +2047,9 @@ pm run lint.
   * Ran `npm run build` in `frontend/` with no reported TypeScript or build errors. Manual UI reprocess test not executed in this step.
 * Notes:
 
-  * Added per-row ìReprocessî action in the Documents list for `uploaded`/`error` files, calling `/api/files/:id/process`, disabling during the request, and updating status to `processing` locally on success. Upload behavior and existing status/type rendering remain unchanged.
+  * Added per-row ÔøΩReprocessÔøΩ action in the Documents list for `uploaded`/`error` files, calling `/api/files/:id/process`, disabling during the request, and updating status to `processing` locally on success. Upload behavior and existing status/type rendering remain unchanged.
 
-### STEP 9.13 ó End-to-End Verification: Upload ? Storage ? DB ? Pipeline Trigger ó Completed
+### STEP 9.13 ÔøΩ End-to-End Verification: Upload ? Storage ? DB ? Pipeline Trigger ÔøΩ Completed
 
 * Date: December 5, 2025
 * Files CREATED:
@@ -2070,3 +2070,56 @@ pm run lint.
 * Notes:
 
   * This entry reserves the end-to-end verification record for Step 9; execute the described checks in the target environment to confirm upload?storage?DB?n8n pipeline health. No code changes in this step.
+
+STEP FIX ‚Äî Convert backend folder into real Next.js API app ‚Äî Completed
+
+Date: <fill in today‚Äôs date>
+
+Files CREATED:
+
+backend/next.config.mjs
+
+backend/tsconfig.json
+
+backend/next-env.d.ts
+
+backend/app/page.tsx
+
+Files MODIFIED:
+
+backend/package.json
+
+backend/app/api/debug-supabase/route.ts (only if you had to adjust imports; remove if unchanged)
+
+backend/app/api/files/upload/route.ts (only if you had to adjust imports; remove if unchanged)
+
+backend/app/api/files/[id]/process/route.ts (only if you had to adjust imports; remove if unchanged)
+
+Dependencies ADDED:
+
+next@<version>
+
+react@<version>
+
+react-dom@<version>
+
+typescript@<version>
+
+@types/node@<version>
+
+@types/react@<version>
+
+@types/react-dom@<version>
+
+Config changes:
+
+Added Next.js config (backend/next.config.mjs) and TypeScript config (backend/tsconfig.json) to turn backend/ into a standalone Next.js API project suitable for Vercel deployment.
+
+Testing result:
+
+Ran npm install and npm run dev in backend/. Confirmed that a Next.js dev server starts without fatal errors. Visited http://localhost:<backend-port>/ and saw the minimal ‚ÄúBackend OK‚Äù page. Called http://localhost:<backend-port>/api/debug-supabase and confirmed the route executes and returns JSON (either success or a Supabase configuration error, depending on env setup), proving that app/api routes are being served by the backend Next project.
+
+Notes:
+
+This sub-step converts the backend/ folder from a placeholder into a real Next.js API app while preserving all existing API route implementations from Steps 7 and 9. Future steps can now deploy backend/ as a separate Vercel project and wire the frontend project to these backend APIs via a NEXT_PUBLIC_BACKEND_URL.
+

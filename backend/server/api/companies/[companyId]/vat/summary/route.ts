@@ -1,15 +1,14 @@
 import { NextRequest } from "next/server";
-import { ok, badRequest } from "../../../../../_utils/responses";
+import { ok, badRequest } from "../../../../_utils/responses";
 import { requireUser } from "../../../../../../lib/auth/server-auth";
 
-interface RouteContext {
-  params: { companyId: string };
-}
-
-export async function GET(request: NextRequest, context: RouteContext) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Promise<{ companyId: string }> }
+) {
   await requireUser(request as unknown as Request);
 
-  const companyId = context?.params?.companyId;
+  const { companyId } = await context.params;
   const url = new URL(request.url);
   const period_start = url.searchParams.get("period_start");
   const period_end = url.searchParams.get("period_end");

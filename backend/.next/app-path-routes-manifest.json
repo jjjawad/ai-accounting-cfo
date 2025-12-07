@@ -1,0 +1,15 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/auth-test/route": "/api/auth-test",
+  "/api/companies/[companyId]/cashflow/forecast/route": "/api/companies/[companyId]/cashflow/forecast",
+  "/api/companies/[companyId]/dashboard/overview/route": "/api/companies/[companyId]/dashboard/overview",
+  "/api/companies/[companyId]/transactions/categorize/route": "/api/companies/[companyId]/transactions/categorize",
+  "/api/companies/[companyId]/transactions/route": "/api/companies/[companyId]/transactions",
+  "/api/companies/route": "/api/companies",
+  "/api/debug-supabase/route": "/api/debug-supabase",
+  "/api/files/[id]/process/route": "/api/files/[id]/process",
+  "/api/files/upload/route": "/api/files/upload",
+  "/api/ping/route": "/api/ping",
+  "/page": "/"
+}
