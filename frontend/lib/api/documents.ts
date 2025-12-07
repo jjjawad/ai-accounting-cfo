@@ -1,6 +1,17 @@
 export type DocumentType = "bank_statement" | "invoice" | "receipt" | "pdc" | "other";
 export type DocumentStatus = "uploaded" | "processing" | "processed" | "error";
 
+// Read backend URL from env (set in .env.local + Vercel frontend env)
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+// Small helper to get a clean base URL without trailing slash
+function getBackendBaseUrl() {
+  if (!BACKEND_BASE_URL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not configured for the frontend");
+  }
+  return BACKEND_BASE_URL.replace(/\/$/, "");
+}
+
 export async function uploadDocument(params: {
   file: File;
   companyId: string;
@@ -13,7 +24,9 @@ export async function uploadDocument(params: {
     formData.append("type", params.type);
   }
 
-  const res = await fetch("/api/files/upload", {
+  const baseUrl = getBackendBaseUrl();
+
+  const res = await fetch(`${baseUrl}/api/files/upload`, {
     method: "POST",
     body: formData,
   });
